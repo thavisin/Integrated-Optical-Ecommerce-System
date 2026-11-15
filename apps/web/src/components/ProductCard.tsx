@@ -29,33 +29,31 @@ export default function ProductCard({ product }: { product: Product }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={media(product.imageUrl)} alt={product.name} width={800} height={600} />
         ) : (
-          <span className="flex h-full w-full items-center justify-center" aria-hidden="true">
-            <span className="wordmark" style={{ color: "var(--color-rule)" }}>OptiMart</span>
+          <span className="shop-frame-empty" aria-hidden="true">
+            <span className="wordmark">OptiMart</span>
           </span>
         )}
       </Link>
 
-      <div className="pharm-label pharm-label--stub flex flex-1 flex-col" style={{ borderRadius: "0 0 var(--radius-card) var(--radius-card)", borderTop: 0, borderWidth: "0 1px 1px 1px" }}>
-        <p className="pharm-head">
-          <span>{categoryLabel(product.category)}</span>
-          <span className="num">{product.brand || "OptiMart"}</span>
+      <div className="shop-card-body">
+        <p className="small shop-card-meta">
+          <span>{categoryLabel(product.category)}</span>{" "}
+          <span>{product.brand || "OptiMart"}</span>
         </p>
-        <h3 className="mt-[var(--space-2xs)]" style={{ fontFamily: "var(--font-body)", fontWeight: 500, letterSpacing: 0, lineHeight: 1.35, fontSize: "var(--text-md)", maxWidth: "100%" }}>
-          <Link href={`/products/${product.id}`} className="line-clamp-2 no-underline hover:underline">
+        <h3 className="line-clamp-2">
+          <Link href={`/products/${product.id}`} className="no-underline hover:underline">
             {product.name}
           </Link>
         </h3>
-        <p className="num mt-[var(--space-2xs)]" style={{ fontSize: "var(--text-lg)", fontWeight: 500, color: "var(--color-ink)" }}>
-          {THB(product.price)}
-        </p>
-        <p style={{ marginTop: "var(--space-2xs)", color: out ? "var(--color-muted)" : "var(--color-accent-deep)", fontSize: "var(--text-xs)" }}>
+        <p className="shop-card-price num">{THB(product.price)}</p>
+        <p className="small">
           {out ? "สินค้าหมดชั่วคราว" : `คงเหลือ ${product.stock} ชิ้น`}
         </p>
         <button
           type="button"
           onClick={handleAdd}
           disabled={out}
-          className={`btn btn--sm mt-[var(--space-sm)] w-full ${added ? "btn--quiet" : "btn--primary"}`}
+          className="btn btn--sm btn--quiet mt-4 w-full"
         >
           {added ? "เพิ่มแล้วในตะกร้า" : "หยิบลงตะกร้า"}
         </button>

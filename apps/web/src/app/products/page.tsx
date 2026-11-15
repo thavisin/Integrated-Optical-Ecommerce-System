@@ -17,14 +17,17 @@ function ProductsContent() {
   const sort = params.get("sort") || "newest";
   const page = Number(params.get("page") || 1);
 
-  const [input, setInput] = useState(search);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [total, setTotal] = useState(0);
-  const [pages, setPages] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  /* the field follows the URL: a draft only lives while it belongs to the current search */
+  const [draft, setDraft] = useState<{ of: string; value: string } | null>(null);
+  const input = draft?.of === search ? draft.value : search;
 
-  useEffect(() => setInput(search), [search]);
+  const [results, setResults] = useState<{
+    key: string;
+    products: Product[];
+    total: number;
+    pages: number;
+  } | null>(null);
+  const [failed, setFailed] = useState<{ key: string; message: string } | null>(null);
 
   const qs = new URLSearchParams();
   if (search) qs.set("search", search);
@@ -33,19 +36,30 @@ function ProductsContent() {
   qs.set("page", String(page));
   qs.set("limit", "12");
 
+  const requestKey = qs.toString();
+
   useEffect(() => {
-    setLoading(true);
-    setError("");
-    api(`/api/products?${qs.toString()}`)
+    let alive = true;
+    api(`/api/products?${requestKey}`)
       .then((d) => {
-        setProducts(d.products);
-        setTotal(d.total);
-        setPages(d.pages);
+        if (alive) {
+          setResults({ key: requestKey, products: d.products, total: d.total, pages: d.pages });
+        }
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, category, sort, page]);
+      .catch((e) => {
+        if (alive) setFailed({ key: requestKey, message: e.message });
+      });
+    return () => {
+      alive = false;
+    };
+  }, [requestKey]);
+
+  const error = failed?.key === requestKey ? failed.message : "";
+  const loaded = results?.key === requestKey ? results : null;
+  const loading = !error && !loaded;
+  const products = loaded ? loaded.products : [];
+  const total = loaded ? loaded.total : 0;
+  const pages = loaded ? loaded.pages : 1;
 
   const updateParam = useCallback(
     (key: string, value: string) => {
@@ -64,7 +78,7 @@ function ProductsContent() {
   };
 
   return (
-    <div className="container" style={{ paddingBlock: "var(--space-2xl) var(--section-gap-s)" }}>
+    <div className="container section">
       <h1>สินค้าทั้งหมดของร้าน</h1>
 
       <div className="toolbar mt-[var(--space-md)]">
@@ -73,7 +87,7 @@ function ProductsContent() {
           <input
             id="products-search"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => setDraft({ of: search, value: e.target.value })}
             placeholder="ค้นหาชื่อหรือแบรนด์"
             className="field field-sm"
           />
@@ -115,7 +129,7 @@ function ProductsContent() {
 
         <span className="divider-v" aria-hidden="true" />
 
-        <p className="num whitespace-nowrap text-sm" style={{ color: "var(--color-muted)" }}>
+        <p className="num whitespace-nowrap text-sm text-muted">
           {search ? `ผลการค้นหา "${search}" พบ ${total} รายการ` : `พบ ${total} รายการ`}
         </p>
       </div>

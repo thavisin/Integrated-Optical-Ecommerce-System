@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import Link from "next/link";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
@@ -22,35 +23,32 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Archivo:wght@400;500&family=Archivo+Narrow:wght@600&family=Chonburi&family=Anuphan:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
       </head>
       <body>
         <AuthProvider>
           <CartProvider>
-            <Suspense fallback={<div className="nav" aria-hidden="true"><div className="container nav-inner" /></div>}>
+            <Suspense fallback={<div className="nav nav--pill" aria-hidden="true"><div className="container nav-inner" /></div>}>
               <Navbar />
             </Suspense>
             <main id="main">{children}</main>
-            <footer className="section--tight">
+            <footer className="mast">
               <div className="container">
-                <hr className="divider" />
-                <div className="stack" style={{ marginTop: "var(--space-lg)", gap: "var(--space-sm)" }}>
-                  <a href="/" className="wordmark" aria-label="OptiMart, กลับหน้าแรก">OptiMart</a>
-                  <p className="breadcrumb flex flex-wrap gap-x-[var(--space-lg)] gap-y-[var(--space-2xs)]">
-                    <a href="/products">สินค้าทั้งหมด</a>
-                    <a href="/orders">คำสั่งซื้อของฉัน</a>
-                    <a href="/register">สมัครสมาชิก</a>
-                    <a href="/login">เข้าสู่ระบบ</a>
-                  </p>
-                  <p className="breadcrumb">
-                    © 2026 OptiMart สั่งซื้อแว่นตาออนไลน์ โอนเงินแล้วแนบสลิปในหน้าคำสั่งซื้อ ร้านตรวจสอบและจัดส่งภายใน 1 ถึง 2 วันทำการ
-                  </p>
-                  <p className="breadcrumb" style={{ color: "var(--color-muted)" }}>
-                    ภาพตัวอย่างสินค้าจาก Pexels ใช้ได้ภายใต้ Pexels License
-                  </p>
-                </div>
+                <Link href="/" className="wordmark" aria-label="OptiMart, กลับหน้าแรก">OptiMart</Link>
+                <p className="mast-links">
+                  <Link href="/products">สินค้าทั้งหมด</Link>
+                  <Link href="/orders">คำสั่งซื้อของฉัน</Link>
+                  <Link href="/register">สมัครสมาชิก</Link>
+                  <Link href="/login">เข้าสู่ระบบ</Link>
+                </p>
+                <p>
+                  © 2026 OptiMart สั่งซื้อแว่นตาออนไลน์ โอนเงินแล้วแนบสลิปในหน้าคำสั่งซื้อ ร้านตรวจสอบและจัดส่งภายใน 1 ถึง 2 วันทำการ
+                </p>
+                <p className="small">
+                  ภาพตัวอย่างสินค้าจาก Pexels ใช้ได้ภายใต้ Pexels License
+                </p>
               </div>
             </footer>
           </CartProvider>

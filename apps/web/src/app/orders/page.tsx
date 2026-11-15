@@ -16,14 +16,10 @@ export default function OrdersPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (authLoading || !user) return;
     api("/api/orders")
       .then((d) => setOrders(d.orders))
-      .catch((e) => setError(e.message))
+      .catch((err) => setError(err instanceof Error ? err.message : String(err)))
       .finally(() => setLoading(false));
   }, [user, authLoading]);
 
@@ -31,70 +27,79 @@ export default function OrdersPage() {
 
   if (!user)
     return (
-      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+      <div className="container max-w-3xl py-16">
         <EmptyState icon="auth" title="เข้าสู่ระบบก่อนจึงจะเห็นประวัติการสั่งซื้อของคุณ">
-          <Link href="/login" className="btn btn--sm mt-[var(--space-2xs)] btn--primary">เข้าสู่ระบบ</Link>
+          <Link href="/login" className="btn btn--sm btn--primary mt-2">เข้าสู่ระบบ</Link>
         </EmptyState>
       </div>
     );
 
   if (error)
     return (
-      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+      <div className="container max-w-3xl py-16">
         <EmptyState icon="warn" title={error} />
       </div>
     );
 
   if (orders.length === 0)
     return (
-      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+      <div className="container max-w-3xl py-16">
         <EmptyState icon="orders" title="ยังไม่มีประวัติการสั่งซื้อ">
-          <Link href="/products" className="btn btn--sm mt-[var(--space-2xs)] btn--primary">เริ่มเลือกแว่นตา</Link>
+          <Link href="/products" className="btn btn--sm btn--primary mt-2">เริ่มเลือกแว่นตา</Link>
         </EmptyState>
       </div>
     );
 
   return (
-    <div className="container max-w-4xl" style={{ paddingBlock: "var(--space-lg) var(--section-gap-s)" }}>
+    <div className="container max-w-4xl py-10">
       <h1>คำสั่งซื้อของฉัน</h1>
-      <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+      <p className="lead mt-2 text-muted">
         ทุกคำสั่งซื้อพร้อมสถานะการตรวจสลิปและการจัดส่ง
       </p>
 
-      <ul className="card mt-[var(--space-xl)] divide-y" style={{ borderColor: "var(--color-rule)", listStyle: "none", margin: 0, padding: 0 }}>
-        {orders.map((order) => {
-          const firstItem = order.items[0];
-          const extraCount = order.items.length - 1;
-          return (
-            <li key={order.id} className="border-b last:border-b-0" style={{ borderColor: "var(--color-rule)" }}>
-              <Link
-                href={`/orders/${order.id}`}
-                className="block p-[var(--space-lg)] no-underline transition-colors duration-[var(--dur-short)] hover:bg-[var(--color-paper-2)]"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-[var(--space-sm)]">
-                  <div>
-                    <p className="num font-medium" style={{ color: "var(--color-ink)" }}>{orderNo(order.id)}</p>
-                    <p className="num text-xs" style={{ color: "var(--color-muted)" }}>{formatDateTime(order.createdAt)} น.</p>
-                  </div>
-                  <StatusBadge status={order.status} />
-                </div>
-                <div className="mt-[var(--space-sm)] flex flex-wrap items-center justify-between gap-[var(--space-sm)] text-sm">
-                  <span style={{ color: "var(--color-ink-2)" }}>
+      <div className="tbl-scroll mt-10" tabIndex={0} role="region" aria-label="ตารางคำสั่งซื้อ">
+        <table className="tbl acct-orders">
+          <thead>
+            <tr>
+              <th scope="col">คำสั่งซื้อ</th>
+              <th scope="col">วันที่</th>
+              <th scope="col">รายการ</th>
+              <th scope="col" className="text-right">ยอดรวม</th>
+              <th scope="col">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => {
+              const firstItem = order.items[0];
+              const extraCount = order.items.length - 1;
+              return (
+                <tr key={order.id}>
+                  <td>
+                    <Link
+                      href={`/orders/${order.id}`}
+                      className="num font-medium text-ink no-underline hover:underline"
+                    >
+                      {orderNo(order.id)}
+                    </Link>
+                  </td>
+                  <td className="num whitespace-nowrap text-muted">{formatDateTime(order.createdAt)} น.</td>
+                  <td>
                     {firstItem?.product?.name ?? `สินค้าหมายเลข ${firstItem?.productId}`}
-                    {extraCount > 0 && <span style={{ color: "var(--color-muted)" }}> และอีก {extraCount} รายการ</span>}
-                  </span>
-                  <span className="num font-bold" style={{ color: "var(--color-accent-deep)" }}>{THB(order.total)}</span>
-                </div>
-                {order.status === "REJECTED" && order.note && (
-                  <p className="mt-[var(--space-xs)] text-xs" style={{ color: "var(--color-muted)" }}>
-                    สลิปไม่ผ่านการตรวจ: {order.note} ส่งสลิปใหม่ได้ในหน้ารายละเอียด
-                  </p>
-                )}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+                    {extraCount > 0 && <span className="text-muted"> และอีก {extraCount} รายการ</span>}
+                    {order.status === "REJECTED" && order.note && (
+                      <span className="small mt-1 block">
+                        สลิปไม่ผ่านการตรวจ: {order.note} ส่งสลิปใหม่ได้ในหน้ารายละเอียด
+                      </span>
+                    )}
+                  </td>
+                  <td className="num text-right font-medium text-ink">{THB(order.total)}</td>
+                  <td><StatusBadge status={order.status} /></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,90 @@
+/* Hallmark · partial of globals.css, which carries the full stamp (theme: Solstice, solstice: long-light, redesign: full, copy: th) */
+/* Backoffice (/admin, /admin/orders, /admin/products and the admin shell): owned by Task 4. Page-specific rules only; shared classes live in globals.css (see apps/web/design.md).
+ * copy: added "รายการรอตรวจสลิป", "ไปตรวจสลิปที่รออยู่" · the slip-queue figure's own label and its link to /admin/orders
+ * copy: added "คำสั่งซื้อ", "ลูกค้า", "รายการ", "ยอดรวม", "การจัดการ" · the order actions became a .tbl, so each column needs a head
+ * copy: added "อนุมัติสลิป", "ปฏิเสธสลิป", "ทำเครื่องหมายจัดส่งแล้ว", "ทำเครื่องหมายสำเร็จ", "ยกเลิกคำสั่งซื้อ", "เปิดสลิปเป็น PDF", "ยืนยันการปฏิเสธ", "ยกเลิก" · the Dose buttons rendered empty, so none of them had an accessible name
+ * copy: reworded "เหตุผลที่สลิปของ {orderNo} ไม่ผ่าน จะแสดงให้ลูกค้าเห็น" to "เหตุผลที่สลิปไม่ผ่าน ลูกค้าจะเห็นข้อความนี้" · the dialog title already names the order, so the label carries only the reason
+ * copy: added "เช่น ยอดเงินในสลิปไม่ตรงกับยอดคำสั่งซื้อ" · the reject textarea's placeholder example */
+@layer components {
+/* ---------- the shell: a paper-2 rail with a 2px ink rule, tabs under 60rem ---------- */
+
+.adm-shell { display: grid; gap: var(--space-lg); }
+@media (min-width: 60rem) {
+  .adm-shell { grid-template-columns: 15rem minmax(0, 1fr); gap: var(--space-xl); align-items: start; }
+  .adm-rail { position: sticky; top: var(--space-3xl); }
+}
+.adm-rail { display: none; }
+@media (min-width: 60rem) { .adm-rail { display: block; } }
+
+.adm-nav { display: flex; flex-direction: column; background: var(--color-paper-2); border-top: var(--rule-bar) solid var(--color-ink); border-right: var(--rule-bar) solid var(--color-ink); padding-block: var(--space-2xs); }
+.adm-nav a { display: flex; align-items: center; min-height: 44px; padding: 0 var(--space-sm); border-left: 3px solid transparent; font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-ink-2); text-decoration: none; }
+.adm-nav a:hover { background: var(--color-paper-3); color: var(--color-ink); }
+.adm-nav a:active { transform: translateY(1px); }
+.adm-nav a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.adm-nav a[aria-current="page"] { border-left-color: var(--color-accent); color: var(--color-ink); }
+.adm-rail-label { margin: 0; padding: var(--space-xs) var(--space-sm); color: var(--color-muted); }
+.adm-nav-exit { margin-top: var(--space-2xs); border-top: var(--rule-hair) solid var(--color-rule); }
+
+/* the guard screens: one centred well */
+.adm-guard { max-width: 30rem; margin-inline: auto; text-align: center; }
+.adm-guard h1 { max-width: none; font-size: var(--text-xl); }
+.adm-guard p { margin-top: var(--space-sm); color: var(--color-muted); }
+.adm-guard .btn { margin-top: var(--space-lg); }
+
+/* app scope: the display face is the page title only, section heads are body face */
+[data-scope="app"] h2 { font: 500 var(--text-lg)/1.25 var(--font-body); letter-spacing: 0; }
+
+/* ---------- /admin: the slip queue leads, beside the recent orders ---------- */
+
+.adm-lead { display: grid; gap: var(--space-lg); }
+@media (min-width: 64rem) { .adm-lead { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); align-items: start; } }
+
+.adm-queue { display: block; color: inherit; text-decoration: none; }
+.adm-queue:hover { border-color: var(--color-accent); }
+.adm-queue:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+.adm-queue-figure { display: block; font: 500 var(--text-3xl)/1 var(--font-body); font-variant-numeric: tabular-nums; color: var(--color-accent); }
+.adm-queue-label { display: block; margin-top: var(--space-xs); font: 600 var(--text-xs)/1.4 var(--font-outlier); color: var(--color-muted); }
+.adm-queue-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: var(--space-sm); font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.16em; }
+.adm-queue:hover .adm-queue-link { color: var(--color-accent); }
+
+/* the monthly bars: one row per month, ink bar, the latest month in vermilion */
+.adm-bars { list-style: none; margin: var(--space-md) 0 0; padding: 0; display: grid; gap: var(--space-sm); }
+.adm-bars li { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr) 5.5rem; align-items: center; gap: var(--space-sm); }
+.adm-bar { display: block; height: 12px; min-width: 0; background: var(--color-ink); }
+.adm-bar--latest { background: var(--color-accent); }
+
+/* the status bar: square segments, token colours, hairline ink between them */
+.adm-status { display: flex; height: 14px; overflow: hidden; background: var(--color-paper-3); }
+.adm-status > span { flex-shrink: 0; border-right: var(--rule-hair) solid var(--color-paper-2); }
+.adm-status > span:last-child { border-right: 0; }
+
+/* top products: a ruled ranked list, never a table of cards */
+.adm-ranked { list-style: none; margin: var(--space-md) 0 0; padding: 0; }
+.adm-ranked li { display: flex; align-items: baseline; gap: var(--space-sm); padding-block: var(--space-sm); border-top: var(--rule-hair) dotted var(--color-gold); }
+.adm-ranked li:first-child { border-top: 0; padding-top: 0; }
+.adm-ranked-no { flex-shrink: 0; width: 1.25rem; font-size: var(--text-sm); color: var(--color-muted); }
+
+/* ---------- /admin/orders and /admin/products: dense tables ---------- */
+
+/* 36px buttons with a 44px hit area (app scope) */
+.adm-acts { display: flex; flex-wrap: wrap; gap: var(--space-2xs); }
+.adm-acts .btn { position: relative; }
+.adm-acts .btn::after { content: ""; position: absolute; inset-inline: 0; inset-block: -4px; }
+
+.adm-cell-note { display: block; margin-top: var(--space-3xs); font: 600 var(--text-xs)/1.4 var(--font-outlier); color: var(--color-muted); }
+
+.adm-items { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3xs); font-size: var(--text-sm); color: var(--color-ink-2); min-width: 12rem; }
+.adm-items li { display: flex; justify-content: space-between; gap: var(--space-sm); }
+
+/* the slip viewer stays square on paper-2 with its 2px ink border (shared .modal) */
+.modal.adm-slip-modal { max-width: 30rem; }
+.adm-slip { background: var(--color-paper-3); padding: var(--space-sm); outline: var(--rule-hair) solid color-mix(in oklab, var(--color-ink) 10%, transparent); outline-offset: calc(-1 * var(--rule-hair)); }
+.adm-slip > img { max-height: 60dvh; margin-inline: auto; object-fit: contain; }
+.adm-reject { display: grid; gap: var(--space-md); }
+
+/* the product image field: a dashed square slot on paper-2 */
+.adm-upload { display: flex; align-items: center; justify-content: center; width: 9rem; height: 7rem; flex-shrink: 0; overflow: hidden; cursor: pointer; border: var(--rule-bar) dashed var(--color-rule); background: var(--color-paper-2); text-align: center; }
+.adm-upload:hover { border-color: var(--color-ink); background: var(--color-paper); }
+.adm-upload:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.adm-upload img { width: 100%; height: 100%; object-fit: cover; }
+}
