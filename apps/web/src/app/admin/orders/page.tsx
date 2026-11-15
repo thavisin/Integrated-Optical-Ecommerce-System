@@ -107,7 +107,7 @@ export default function AdminOrdersPage() {
       </div>
 
       {notice && <div className="noty" role="status">{notice}</div>}
-      {error && <ErrorBanner message={error} />}
+      {error && !(rejectTarget || slipOrder) && <ErrorBanner message={error} />}
 
       <div className="seg seg--tabs" role="group" aria-label="กรองคำสั่งซื้อตามสถานะ">
         {FILTER_TABS.map((t) => (
@@ -265,6 +265,7 @@ export default function AdminOrdersPage() {
                 <X size={18} weight="bold" aria-hidden="true" />
               </button>
             </div>
+            {error && <ErrorBanner message={error} />}
             <div className="adm-slip mt-4">
               {slipOrder.slipUrl?.toLowerCase().endsWith(".pdf") ? (
                 <a
@@ -315,6 +316,7 @@ export default function AdminOrdersPage() {
                 <X size={18} weight="bold" aria-hidden="true" />
               </button>
             </div>
+            {error && <ErrorBanner message={error} />}
             <div className="adm-reject mt-4">
               <div>
                 <label className="label" htmlFor="reject-reason">เหตุผลที่สลิปไม่ผ่าน ลูกค้าจะเห็นข้อความนี้</label>

@@ -2,7 +2,8 @@
 /* Store pages (/, /products, /products/[id]): owned by Task 2. Page-specific rules only; shared classes live in globals.css (see apps/web/design.md).
  * copy: reworded "คงเหลือในสต็อก 5 ชิ้น" to the ruled pair "คงเหลือ" / "5 ชิ้น" · brief Step 5 (the buy well carries stock as a ruled row)
  * copy: reworded "สินค้าหมดชั่วคราว พบกันรอบหน้า" to "หมดชั่วคราว" · brief Step 5 (the buy well's stock row)
- * copy: reworded "กรอบแว่น แบรนด์ OptiMart" to "แบรนด์ OptiMart" · brief Step 5 (the buy well's category row carries the category) */
+ * copy: reworded "กรอบแว่น แบรนด์ OptiMart" to "แบรนด์ OptiMart" · brief Step 5 (the buy well's category row carries the category)
+ * copy: added "หมวดหมู่", "คงเหลือ", "ราคา" · the buy well is a .rule-list, so each row needs its label */
 @layer components {
 /* ---------- home: the Ledge ---------- */
 
@@ -135,7 +136,7 @@
 .shop-detail-body { display: grid; align-content: start; gap: var(--space-lg); }
 .shop-detail-title { font-size: var(--text-display-s); }
 
-.shop-detail-well { padding: var(--space-lg) var(--space-xl); }
+.well.shop-detail-well { padding: var(--space-lg) var(--space-xl); }
 
 .shop-buy { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md); }
 .shop-buy-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md); }

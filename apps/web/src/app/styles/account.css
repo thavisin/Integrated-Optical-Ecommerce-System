@@ -1,5 +1,11 @@
 /* Hallmark · partial of globals.css, which carries the full stamp (theme: Solstice, solstice: long-light, redesign: full, copy: th) */
-/* Account and checkout pages (/cart, /checkout, /orders, /orders/[id], /login, /register): owned by Task 3. Page-specific rules only; shared classes live in globals.css (see apps/web/design.md). */
+/* Account and checkout pages (/cart, /checkout, /orders, /orders/[id], /login, /register): owned by Task 3. Page-specific rules only; shared classes live in globals.css (see apps/web/design.md).
+ * copy: reworded "พร้อมเพย์ 08-1234-5678" to the ruled pair "พร้อมเพย์" / "08-1234-5678" · payment facts are a .rule-list, one label per row
+ * copy: reworded "ยอดที่ต้องโอน {total}" to the ruled pair "ยอดที่ต้องโอน" / "{total}" · same list, the figure in the value cell
+ * copy: added "เลขที่บัญชี", "สลิปโอนเงิน" · the payment list names the account-number row and the upload field
+ * copy: added "ผู้รับ", "โทรศัพท์", "ที่อยู่", "หมายเหตุ" · the shipping block is a ruled list, and the note row shows only for a live order
+ * copy: added "ยกเลิกแล้ว", "ยกเลิกแล้วเนื่องจาก {note}", "คำสั่งซื้อนี้{status} จึงไม่แสดงลำดับสถานะ", and the no-note reject line "สลิปไม่ผ่านการตรวจ กรุณาโอนเงินใหม่แล้วส่งสลิปด้านล่าง" · the year-line now carries the reason the Dose banner carried
+ * copy: added "คำสั่งซื้อ", "วันที่", "รายการ", "ยอดรวม", "สถานะ", "ตารางคำสั่งซื้อ" · the order list became a .tbl in a scroll region, so each column and the region need a name */
 @layer components {
 /* ruled line items: cart and order detail */
 .acct-rows { list-style: none; margin: 0; padding: 0; border-top: var(--rule-bar) solid var(--color-ink); border-bottom: var(--rule-hair) solid var(--color-rule); }
@@ -28,6 +34,8 @@
 
 /* the slip upload: a square field, the label sits above it */
 .field.acct-file { padding: var(--space-2xs) var(--space-sm); }
+/* the hidden file input lives inside its label, so its focus shows on the label */
+.acct-file-btn:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .acct-file::file-selector-button { margin-right: var(--space-sm); padding: var(--space-2xs) var(--space-sm); border: var(--rule-hair) solid var(--color-ink); border-radius: 0; background: var(--color-paper); color: var(--color-ink); font: 500 var(--text-sm)/1.4 var(--font-body); cursor: pointer; }
 .acct-file::file-selector-button:hover { background: var(--color-paper-3); }
 .acct-slip { max-width: 26rem; padding: var(--space-xs); background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); }

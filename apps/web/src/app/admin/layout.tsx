@@ -39,7 +39,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
 
         <div className="min-w-0">
           {/* mobile tabs */}
-          <nav className="seg seg--tabs mb-4 md:hidden" aria-label="เมนูผู้ดูแลระบบ">
+          <nav className="seg seg--tabs mb-4 min-[60rem]:hidden" aria-label="เมนูผู้ดูแลระบบ">
             {MENU.map((m) => {
               const active = pathname === m.href;
               return (

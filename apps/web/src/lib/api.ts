@@ -17,7 +17,7 @@ export async function api<T = any>(path: string, options: RequestInit = {}): Pro
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     }
-    const message = data && typeof data === "object" && "message" in data ? String(data.message) : "";
+    const message = data && typeof data === "object" && "message" in data && typeof data.message === "string" ? data.message : "";
     throw new Error(message || `เกิดข้อผิดพลาด (${res.status})`);
   }
   return data as T;

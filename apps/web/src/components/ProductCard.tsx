@@ -37,7 +37,8 @@ export default function ProductCard({ product }: { product: Product }) {
 
       <div className="shop-card-body">
         <p className="small">
-          {categoryLabel(product.category)} · {product.brand || "OptiMart"}
+          <span>{categoryLabel(product.category)}</span>{" "}
+          <span>{product.brand || "OptiMart"}</span>
         </p>
         <h3 className="line-clamp-2">
           <Link href={`/products/${product.id}`} className="no-underline hover:underline">

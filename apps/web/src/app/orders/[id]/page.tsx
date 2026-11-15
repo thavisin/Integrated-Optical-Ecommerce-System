@@ -218,16 +218,16 @@ function OrderDetailContent() {
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <div>
-                    <label htmlFor="od-newslip" className="btn btn--sm btn--quiet cursor-pointer">
+                    <label htmlFor="od-newslip" className="btn btn--sm btn--quiet cursor-pointer acct-file-btn">
                       เลือกไฟล์สลิป
+                      <input
+                        id="od-newslip"
+                        type="file"
+                        accept="image/*,application/pdf"
+                        className="visually-hidden"
+                        onChange={onPickSlip}
+                      />
                     </label>
-                    <input
-                      id="od-newslip"
-                      type="file"
-                      accept="image/*,application/pdf"
-                      className="visually-hidden"
-                      onChange={onPickSlip}
-                    />
                   </div>
                   <button
                     type="button"

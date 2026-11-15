@@ -9,9 +9,11 @@
 /* Hallmark · waive 85 · the login screen's form is the sign-in itself, email and password answered by the one submit · no mailing list sits on the page, and the close is the mast's links and the Pexels credit */
 /* Hallmark · dismissed 28a · the first image on these routes is a 56x40 table thumbnail or an 80x60 basket thumb; the row's own text paints first, so the picture is never the LCP candidate */
 /* Hallmark · dismissed 77 · the home keeps its hero, bento and facts band inside one main wrapper, so the section count reads two; the rhythm is hero, grid, band, mast, and the band closes the page */
-/* Hallmark · dropped shippingName: e.target.value, setInput(e.target.value), reject(order), reject(slipOrder), q - 1), q + 1) · six handler literals were rewritten, not lost: the checkout name marks the user's edit before falling back to their account name, the catalogue search commits a debounced draft, the qty clamps live inside QtyStepper, and reject opens the reason dialog */
+/* Hallmark · dropped shippingName: e.target.value, setInput(e.target.value), reject(order), reject(slipOrder), q - 1), q + 1) · six handler literals were rewritten, not lost: the checkout name marks the user's edit before falling back to their account name, the catalogue search keeps the typed value in a draft until the search button submits it, the qty clamps live inside QtyStepper, and reject opens the reason dialog */
 /* Hallmark · reworded "qty-label" to "qty-label and bar-qty" · the sticky buy bar repeats the stepper under 48rem, so the second copy needs its own label id */
 /* Hallmark · sweep: Floor 0 FAIL · Reflex 0 open (5 waived: 49b, 44c, 77, 83, 85) · WARN 0 (2 dismissed) · finish-review: in-thread, 1 resolved · kept: links 32/32, fields 12/12, handlers 47/53 (6 reworded on record), headings 19/19, figures 11/11 */
+/* Hallmark · reworded "ดูรายละเอียดสินค้า {name}" to "ดูรายละเอียด {name}" · the card's link names what it opens; the product name already names which product */
+/* Hallmark · dropped "มาใหม่ในร้าน" · the hero card's badge is gone; the caption carries the category in vermilion and the name in live type */
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./base.css" layer(base);
@@ -20,7 +22,7 @@
 @import "./styles/admin.css";
 
 /* Tailwind 4 generates its own breakpoint-capped `container` utility (1280px at 80rem) that would beat base.css; ours wins */
-@utility container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); box-sizing: border-box; }
+@utility container { width: 100%; max-width: var(--container); margin-inline: auto; box-sizing: border-box; }
 
 /* Shared classes sit in @layer components so Tailwind utilities (mt-4, md:hidden, w-full) still override them. */
 @layer components {
@@ -58,7 +60,7 @@
 .band--ink .icon-btn:hover { background: color-mix(in oklab, var(--color-paper) 12%, transparent); }
 
 /* type */
-h1, h2, h3 { font-weight: var(--display-weight); line-height: 1; color: var(--color-ink); }
+h1, h2, h3 { font-weight: var(--display-weight); line-height: 1.2; color: var(--color-ink); }
 .small, figcaption { font: 600 var(--text-xs)/1.4 var(--font-outlier); color: var(--color-muted); }
 .lead { color: var(--color-ink-2); }
 a:hover { text-decoration-color: var(--color-accent); }

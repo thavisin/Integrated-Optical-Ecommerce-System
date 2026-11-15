@@ -1,5 +1,10 @@
 /* Hallmark · partial of globals.css, which carries the full stamp (theme: Solstice, solstice: long-light, redesign: full, copy: th) */
-/* Backoffice (/admin, /admin/orders, /admin/products and the admin shell): owned by Task 4. Page-specific rules only; shared classes live in globals.css (see apps/web/design.md). */
+/* Backoffice (/admin, /admin/orders, /admin/products and the admin shell): owned by Task 4. Page-specific rules only; shared classes live in globals.css (see apps/web/design.md).
+ * copy: added "รายการรอตรวจสลิป", "ไปตรวจสลิปที่รออยู่" · the slip-queue figure's own label and its link to /admin/orders
+ * copy: added "คำสั่งซื้อ", "ลูกค้า", "รายการ", "ยอดรวม", "การจัดการ" · the order actions became a .tbl, so each column needs a head
+ * copy: added "อนุมัติสลิป", "ปฏิเสธสลิป", "ทำเครื่องหมายจัดส่งแล้ว", "ทำเครื่องหมายสำเร็จ", "ยกเลิกคำสั่งซื้อ", "เปิดสลิปเป็น PDF", "ยืนยันการปฏิเสธ", "ยกเลิก" · the Dose buttons rendered empty, so none of them had an accessible name
+ * copy: reworded "เหตุผลที่สลิปของ {orderNo} ไม่ผ่าน จะแสดงให้ลูกค้าเห็น" to "เหตุผลที่สลิปไม่ผ่าน ลูกค้าจะเห็นข้อความนี้" · the dialog title already names the order, so the label carries only the reason
+ * copy: added "เช่น ยอดเงินในสลิปไม่ตรงกับยอดคำสั่งซื้อ" · the reject textarea's placeholder example */
 @layer components {
 /* ---------- the shell: a paper-2 rail with a 2px ink rule, tabs under 60rem ---------- */
 
@@ -72,7 +77,7 @@
 .adm-items li { display: flex; justify-content: space-between; gap: var(--space-sm); }
 
 /* the slip viewer stays square on paper-2 with its 2px ink border (shared .modal) */
-.adm-slip-modal { max-width: 30rem; }
+.modal.adm-slip-modal { max-width: 30rem; }
 .adm-slip { background: var(--color-paper-3); padding: var(--space-sm); outline: var(--rule-hair) solid color-mix(in oklab, var(--color-ink) 10%, transparent); outline-offset: calc(-1 * var(--rule-hair)); }
 .adm-slip > img { max-height: 60dvh; margin-inline: auto; object-fit: contain; }
 .adm-reject { display: grid; gap: var(--space-md); }

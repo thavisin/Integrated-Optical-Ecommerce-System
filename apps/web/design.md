@@ -102,5 +102,7 @@ Every control has eight states: rest, `:hover`, `:active`, `:focus-visible` (a 2
 ## Partials
 `styles/shop.css` (Task 2), `styles/account.css` (Task 3) and `styles/admin.css` (Task 4) are imported by `globals.css` and hold page-specific rules only. Each partial keeps the Hallmark pointer comment on line 1 and **all of its rules inside its `@layer components { }` block**. An unlayered rule there would beat both the shared classes and every Tailwind utility.
 
+The partials are imported before the shared block, so a partial rule that overrides a shared class sits earlier in the same layer and loses on equal specificity. Compound the shared class: `.well.shop-detail-well` for `.well`, `.modal.adm-slip-modal` for `.modal`, `.rule-list.shop-facts` for `.rule-list`, `.field.acct-file` for `.field`. A descendant selector (`.adm-slip > img`) is the pattern for inner parts; never a bare page class alone.
+
 ## Exports
 `tokens.css` in this project, with Tailwind theme variables in its `@theme static` block.
