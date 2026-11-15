@@ -100,9 +100,13 @@ export default function Navbar() {
             </>
           )}
 
-          <Link href="/cart" className="icon-btn" aria-label={`ตะกร้าสินค้า มีสินค้า ${count} ชิ้น`}>
+          <Link
+            href="/cart"
+            className="icon-btn"
+            aria-label={`ตะกร้าสินค้า${mounted ? ` มีสินค้า ${count} ชิ้น` : ""}`}
+          >
             <ShoppingCart size={20} weight="bold" aria-hidden="true" />
-            {count > 0 && (
+            {mounted && count > 0 && (
               <span className="count num" aria-hidden="true">
                 {count}
               </span>
