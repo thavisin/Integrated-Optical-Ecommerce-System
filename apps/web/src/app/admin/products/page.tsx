@@ -45,16 +45,28 @@ export default function AdminProductsPage() {
     try {
       const d = await api("/api/products?limit=100");
       setProducts(d.products);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    load();
+    (async () => {
+      await load();
+    })();
   }, [load]);
+
+  // Escape closes the add/edit dialog
+  useEffect(() => {
+    if (!modalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setModalOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [modalOpen]);
 
   const openCreate = () => {
     setEditing(null);
@@ -113,8 +125,8 @@ export default function AdminProductsPage() {
       setModalOpen(false);
       await load();
       setTimeout(() => setNotice(""), 3500);
-    } catch (err: any) {
-      setFormError(err.message);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : String(err));
     } finally {
       setSaving(false);
     }
@@ -127,22 +139,22 @@ export default function AdminProductsPage() {
       setNotice(`ลบสินค้า "${p.name}" เรียบร้อยแล้ว`);
       await load();
       setTimeout(() => setNotice(""), 3500);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
       setTimeout(() => setError(""), 3500);
     }
   };
 
   return (
     <div className="stack-lg">
-      <div className="flex flex-wrap items-center justify-between gap-[var(--space-md)]">
+      <div className="adm-acts flex-wrap items-center justify-between gap-4">
         <div>
           <h1>จัดการสินค้าในสต็อก</h1>
-          <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+          <p className="mt-2 text-sm text-muted">
             เพิ่ม แก้ไข และลบสินค้าของร้าน
           </p>
         </div>
-        <button type="button" onClick={openCreate} className="btn btn--primary btn--sm">
+        <button type="button" onClick={openCreate} className="btn btn--primary">
           เพิ่มสินค้าใหม่
         </button>
       </div>
@@ -153,7 +165,7 @@ export default function AdminProductsPage() {
       {loading ? (
         <Spinner label="กำลังโหลดสินค้า" />
       ) : (
-        <div className="card tbl-scroll">
+        <div className="tbl-scroll">
           <table className="tbl">
             <thead>
               <tr>
@@ -168,8 +180,8 @@ export default function AdminProductsPage() {
               {products.map((p) => (
                 <tr key={p.id}>
                   <td>
-                    <div className="flex items-center gap-[var(--space-sm)]">
-                      <span className="frame" style={{ width: "3.5rem", height: "2.5rem", borderRadius: "var(--radius-input)", flexShrink: 0 }}>
+                    <div className="flex items-center gap-3">
+                      <span className="frame" style={{ width: "3.5rem", height: "2.5rem", flexShrink: 0 }}>
                         {p.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={media(p.imageUrl)} alt="" loading="lazy" width={56} height={40} />
@@ -178,20 +190,20 @@ export default function AdminProductsPage() {
                         )}
                       </span>
                       <span className="min-w-0">
-                        <span className="line-clamp-1 block font-medium">{p.name}</span>
-                        <span className="block text-xs" style={{ color: "var(--color-muted)" }}>{p.brand}</span>
+                        <span className="line-clamp-1 block font-medium text-ink">{p.name}</span>
+                        <span className="block text-xs text-muted">{p.brand}</span>
                       </span>
                     </div>
                   </td>
                   <td>{categoryLabel(p.category)}</td>
                   <td className="num font-medium">{THB(p.price)}</td>
                   <td>
-                    <span className={`chip ${p.stock <= 3 ? "chip--outline" : p.stock <= 10 ? "" : "chip--mint"}`}>
+                    <span className={`chip ${p.stock <= 3 ? "chip--signal" : p.stock <= 10 ? "chip--gold" : "chip--muted"}`}>
                       <span className="num">{p.stock} ชิ้น</span>
                     </span>
                   </td>
-                  <td className="text-right">
-                    <div className="flex justify-end gap-[var(--space-2xs)]">
+                  <td>
+                    <div className="adm-acts justify-end">
                       <button
                         type="button"
                         onClick={() => openEdit(p)}
@@ -203,7 +215,7 @@ export default function AdminProductsPage() {
                       <button
                         type="button"
                         onClick={() => remove(p)}
-                        className="btn btn--sm btn--quiet"
+                        className="btn btn--sm btn--quiet text-muted"
                         aria-label={`ลบสินค้า ${p.name}`}
                       >
                         ลบ
@@ -221,16 +233,16 @@ export default function AdminProductsPage() {
       {modalOpen && (
         <div className="modal-scrim" onClick={() => setModalOpen(false)}>
           <div className="modal" role="dialog" aria-modal="true" aria-labelledby="product-modal-title" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between gap-[var(--space-md)]">
+            <div className="flex items-start justify-between gap-4">
               <h2 id="product-modal-title">
                 {editing ? `แก้ไข ${editing.name}` : "เพิ่มสินค้าใหม่ในสต็อก"}
               </h2>
-              <button type="button" onClick={() => setModalOpen(false)} className="icon-btn" aria-label="ปิดหน้าต่าง">
+              <button type="button" onClick={() => setModalOpen(false)} className="icon-btn" aria-label="ปิดหน้าต่าง" autoFocus>
                 <X size={18} weight="bold" aria-hidden="true" />
               </button>
             </div>
 
-            <form onSubmit={save} className="mt-[var(--space-lg)] grid gap-[var(--space-md)] sm:grid-cols-2">
+            <form onSubmit={save} className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <label className="label" htmlFor="pf-name">ชื่อสินค้า</label>
                 <input
@@ -303,28 +315,23 @@ export default function AdminProductsPage() {
 
               <div className="sm:col-span-2">
                 <p className="label">รูปสินค้า</p>
-                <div className="flex flex-wrap items-start gap-[var(--space-md)]">
-                  <label
-                    htmlFor="pf-image"
-                    className="flex cursor-pointer items-center justify-center overflow-hidden rounded-[var(--radius-input)] text-center"
-                    style={{ width: "9rem", height: "7rem", border: "2px dashed var(--color-rule)", flexShrink: 0 }}
-                  >
+                <div className="flex flex-wrap items-start gap-4">
+                  <label htmlFor="pf-image" className="adm-upload">
                     <input
                       id="pf-image"
                       type="file"
                       accept="image/*"
                       className="sr-only"
-                      style={{ position: "absolute", width: "1px", height: "1px", opacity: 0 }}
                       onChange={onPickFile}
                     />
                     {filePreview ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={filePreview} alt="ตัวอย่างรูปที่เลือก" className="h-full w-full object-cover" />
+                      <img src={filePreview} alt="ตัวอย่างรูปที่เลือก" />
                     ) : (
-                      <span className="text-xs" style={{ color: "var(--color-muted)" }}>อัปโหลดรูปสินค้า</span>
+                      <span className="text-xs text-muted">อัปโหลดรูปสินค้า</span>
                     )}
                   </label>
-                  <div className="min-w-[12rem] flex-1">
+                  <div className="min-w-0 flex-1">
                     <label className="label" htmlFor="pf-url">หรือวางที่อยู่รูปภาพ ถ้าไม่อัปโหลดไฟล์</label>
                     <input
                       id="pf-url"
@@ -339,7 +346,7 @@ export default function AdminProductsPage() {
 
               {formError && <div className="sm:col-span-2"><ErrorBanner message={formError} /></div>}
 
-              <div className="flex justify-end gap-[var(--space-xs)] sm:col-span-2">
+              <div className="adm-acts justify-end sm:col-span-2">
                 <button type="button" onClick={() => setModalOpen(false)} className="btn btn--quiet">ยกเลิก</button>
                 <button type="submit" disabled={saving} className="btn btn--primary" aria-busy={saving}>
                   {saving ? "กำลังบันทึก" : editing ? "บันทึกการแก้ไข" : "เพิ่มสินค้า"}

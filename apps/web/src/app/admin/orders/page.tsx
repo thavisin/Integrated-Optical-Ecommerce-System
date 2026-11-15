@@ -26,22 +26,38 @@ export default function AdminOrdersPage() {
   const [notice, setNotice] = useState("");
   const [filter, setFilter] = useState("");
   const [slipOrder, setSlipOrder] = useState<Order | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<Order | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
   const [busyId, setBusyId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
       const d = await api("/api/orders?all=true");
       setOrders(d.orders);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    load();
+    (async () => {
+      await load();
+    })();
   }, [load]);
+
+  // Escape closes whichever dialog is open
+  useEffect(() => {
+    if (!slipOrder && !rejectTarget) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setSlipOrder(null);
+      setRejectTarget(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [slipOrder, rejectTarget]);
 
   const showNotice = (msg: string) => {
     setNotice(msg);
@@ -58,18 +74,24 @@ export default function AdminOrdersPage() {
       });
       showNotice(`อัปเดต ${orderNo(order.id)} เป็น ${ORDER_STATUS[status]?.label ?? status} แล้ว`);
       setSlipOrder(null);
+      setRejectTarget(null);
       await load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setBusyId(null);
     }
   };
 
-  const reject = async (order: Order) => {
-    const reason = window.prompt(`เหตุผลที่สลิปของ ${orderNo(order.id)} ไม่ผ่าน จะแสดงให้ลูกค้าเห็น`);
-    if (!reason?.trim()) return;
-    await updateStatus(order, "REJECTED", reason);
+  const askReject = (order: Order) => {
+    setRejectReason("");
+    setSlipOrder(null);
+    setRejectTarget(order);
+  };
+
+  const confirmReject = async () => {
+    if (!rejectTarget) return;
+    await updateStatus(rejectTarget, "REJECTED", rejectReason.trim());
   };
 
   const filtered = filter ? orders.filter((o) => o.status === filter) : orders;
@@ -79,7 +101,7 @@ export default function AdminOrdersPage() {
     <div className="stack-lg">
       <div>
         <h1>คำสั่งซื้อและการตรวจสลิป</h1>
-        <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+        <p className="mt-2 text-sm text-muted">
           เปิดสลิป เทียบยอดกับคำสั่งซื้อ แล้วอนุมัติหรือแจ้งเหตุผลกลับลูกค้า
         </p>
       </div>
@@ -103,133 +125,147 @@ export default function AdminOrdersPage() {
       {loading ? (
         <Spinner label="กำลังโหลดคำสั่งซื้อ" />
       ) : filtered.length === 0 ? (
-        <div className="card p-[var(--space-2xl)] text-center text-sm" style={{ color: "var(--color-muted)" }}>
-          ไม่มีคำสั่งซื้อในสถานะนี้
+        <div className="empty">
+          <p className="text-sm text-muted">ไม่มีคำสั่งซื้อในสถานะนี้</p>
         </div>
       ) : (
-        <div className="stack-lg">
-          {filtered.map((order) => (
-            <article key={order.id} className="card p-[var(--space-lg)]">
-              <div className="flex flex-wrap items-start justify-between gap-[var(--space-sm)]">
-                <div>
-                  <div className="flex flex-wrap items-center gap-[var(--space-xs)]">
-                    <h2 className="num" style={{ fontSize: "var(--text-md)", letterSpacing: 0 }}>{orderNo(order.id)}</h2>
-                    <StatusBadge status={order.status} />
-                  </div>
-                  <p className="num text-xs" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
-                    {formatDateTime(order.createdAt)} น. ลูกค้า {order.user?.name} ({order.user?.email})
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="num text-lg font-bold" style={{ color: "var(--color-accent-deep)" }}>{THB(order.total)}</p>
-                  <p className="num text-xs" style={{ color: "var(--color-muted)" }}>
-                    {order.items.reduce((s, i) => s + i.quantity, 0)} ชิ้น
-                  </p>
-                </div>
-              </div>
-
-              <div className="well mt-[var(--space-md)] p-[var(--space-md)] text-xs" style={{ color: "var(--color-ink-2)" }}>
-                <p>ส่งถึง {order.shippingName} เบอร์ {order.phone}</p>
-                <p style={{ marginTop: "var(--space-2xs)" }}>{order.address}</p>
-                {order.note && <p style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>หมายเหตุ {order.note}</p>}
-              </div>
-
-              <ul className="mt-[var(--space-md)] space-y-[var(--space-2xs)] text-sm" style={{ color: "var(--color-ink-2)" }}>
-                {order.items.map((it) => (
-                  <li key={it.id} className="flex justify-between gap-[var(--space-sm)]">
-                    <span className="line-clamp-1">
-                      {it.product?.name ?? `สินค้าหมายเลข ${it.productId}`} <span className="num">x{it.quantity}</span>
+        <div className="tbl-scroll">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th scope="col">คำสั่งซื้อ</th>
+                <th scope="col">ลูกค้า</th>
+                <th scope="col">รายการ</th>
+                <th scope="col">ยอดรวม</th>
+                <th scope="col" className="text-right">การจัดการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((order) => (
+                <tr key={order.id}>
+                  <td>
+                    <span className="num font-medium text-ink whitespace-nowrap">{orderNo(order.id)}</span>
+                    <span className="adm-cell-note num whitespace-nowrap">{formatDateTime(order.createdAt)} น.</span>
+                    <span className="mt-1 block"><StatusBadge status={order.status} /></span>
+                  </td>
+                  <td>
+                    <span className="font-medium">{order.user?.name}</span>
+                    <span className="adm-cell-note">({order.user?.email})</span>
+                    <span className="adm-cell-note">ส่งถึง {order.shippingName} เบอร์ {order.phone}</span>
+                    <span className="adm-cell-note">{order.address}</span>
+                    {order.note && <span className="adm-cell-note">หมายเหตุ {order.note}</span>}
+                  </td>
+                  <td>
+                    <ul className="adm-items">
+                      {order.items.map((it) => (
+                        <li key={it.id}>
+                          <span className="line-clamp-1">
+                            {it.product?.name ?? `สินค้าหมายเลข ${it.productId}`} <span className="num">x{it.quantity}</span>
+                          </span>
+                          <span className="num shrink-0">{THB(it.price * it.quantity)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td>
+                    <span className="num font-medium text-ink">{THB(order.total)}</span>
+                    <span className="adm-cell-note num">
+                      {order.items.reduce((s, i) => s + i.quantity, 0)} ชิ้น
                     </span>
-                    <span className="num ml-[var(--space-sm)] shrink-0">{THB(it.price * it.quantity)}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-[var(--space-md)] flex flex-wrap gap-[var(--space-xs)]">
-                {order.slipUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setSlipOrder(order)}
-                    className="btn btn--sm btn--quiet"
-                  >
-                    ดูสลิปโอนเงิน
-                  </button>
-                )}
-                {order.status === "PENDING_VERIFY" && (
-                  <>
-                    <button
-                      type="button"
-                      disabled={busyId === order.id}
-                      onClick={() => updateStatus(order, "PAID")}
-                      className="btn btn--sm btn--primary"
-                      aria-busy={busyId === order.id}
-                    >
-                    </button>
-                    <button
-                      type="button"
-                      disabled={busyId === order.id}
-                      onClick={() => reject(order)}
-                      className="btn btn--sm btn--quiet"
-                    >
-                    </button>
-                  </>
-                )}
-                {order.status === "PAID" && (
-                  <button
-                    type="button"
-                    disabled={busyId === order.id}
-                    onClick={() => updateStatus(order, "SHIPPED")}
-                    className="btn btn--sm btn--primary"
-                    aria-busy={busyId === order.id}
-                  >
-                  </button>
-                )}
-                {order.status === "SHIPPED" && (
-                  <button
-                    type="button"
-                    disabled={busyId === order.id}
-                    onClick={() => updateStatus(order, "COMPLETED")}
-                    className="btn btn--sm btn--primary"
-                    aria-busy={busyId === order.id}
-                  >
-                  </button>
-                )}
-                {["AWAITING_PAYMENT", "PENDING_VERIFY", "REJECTED"].includes(order.status) && (
-                  <button
-                    type="button"
-                    disabled={busyId === order.id}
-                    onClick={() => {
-                      if (confirm(`ยกเลิกคำสั่งซื้อ ${orderNo(order.id)}?`)) updateStatus(order, "CANCELLED", "แอดมินยกเลิกคำสั่งซื้อ");
-                    }}
-                    className="btn btn--sm btn--quiet"
-                    style={{ color: "var(--color-muted)" }}
-                  >
-                  </button>
-                )}
-              </div>
-            </article>
-          ))}
+                  </td>
+                  <td>
+                    <div className="adm-acts justify-end">
+                      {order.slipUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setSlipOrder(order)}
+                          className="btn btn--sm btn--quiet"
+                        >
+                          ดูสลิปโอนเงิน
+                        </button>
+                      )}
+                      {order.status === "PENDING_VERIFY" && (
+                        <>
+                          <button
+                            type="button"
+                            disabled={busyId === order.id}
+                            onClick={() => updateStatus(order, "PAID")}
+                            className="btn btn--sm btn--primary"
+                            aria-busy={busyId === order.id}
+                          >
+                            อนุมัติสลิป
+                          </button>
+                          <button
+                            type="button"
+                            disabled={busyId === order.id}
+                            onClick={() => askReject(order)}
+                            className="btn btn--sm btn--quiet"
+                          >
+                            ปฏิเสธสลิป
+                          </button>
+                        </>
+                      )}
+                      {order.status === "PAID" && (
+                        <button
+                          type="button"
+                          disabled={busyId === order.id}
+                          onClick={() => updateStatus(order, "SHIPPED")}
+                          className="btn btn--sm btn--primary"
+                          aria-busy={busyId === order.id}
+                        >
+                          ทำเครื่องหมายจัดส่งแล้ว
+                        </button>
+                      )}
+                      {order.status === "SHIPPED" && (
+                        <button
+                          type="button"
+                          disabled={busyId === order.id}
+                          onClick={() => updateStatus(order, "COMPLETED")}
+                          className="btn btn--sm btn--primary"
+                          aria-busy={busyId === order.id}
+                        >
+                          ทำเครื่องหมายสำเร็จ
+                        </button>
+                      )}
+                      {["AWAITING_PAYMENT", "PENDING_VERIFY", "REJECTED"].includes(order.status) && (
+                        <button
+                          type="button"
+                          disabled={busyId === order.id}
+                          onClick={() => {
+                            if (confirm(`ยกเลิกคำสั่งซื้อ ${orderNo(order.id)}?`)) updateStatus(order, "CANCELLED", "แอดมินยกเลิกคำสั่งซื้อ");
+                          }}
+                          className="btn btn--sm btn--quiet text-muted"
+                        >
+                          ยกเลิกคำสั่งซื้อ
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
       {/* slip modal */}
       {slipOrder && (
         <div className="modal-scrim" onClick={() => setSlipOrder(null)}>
-          <div className="modal" role="dialog" aria-modal="true" aria-labelledby="slip-modal-title" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "28rem" }}>
-            <div className="flex items-start justify-between gap-[var(--space-md)]">
+          <div className="modal adm-slip-modal" role="dialog" aria-modal="true" aria-labelledby="slip-modal-title" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 id="slip-modal-title" className="num" style={{ fontSize: "var(--text-md)", letterSpacing: 0 }}>
+                <h2 id="slip-modal-title">
                   สลิปของ {orderNo(slipOrder.id)}
                 </h2>
-                <p className="num text-sm" style={{ color: "var(--color-muted)", marginTop: "var(--space-2xs)" }}>
+                <p className="num mt-2 text-sm text-muted">
                   ยอดคำสั่งซื้อ {THB(slipOrder.total)} เทียบกับยอดในสลิปก่อนอนุมัติ
                 </p>
               </div>
-              <button type="button" onClick={() => setSlipOrder(null)} className="icon-btn" aria-label="ปิดหน้าต่าง">
+              <button type="button" onClick={() => setSlipOrder(null)} className="icon-btn" aria-label="ปิดหน้าต่าง" autoFocus>
                 <X size={18} weight="bold" aria-hidden="true" />
               </button>
             </div>
-            <div className="slip-frame mt-[var(--space-md)]">
+            <div className="adm-slip mt-4">
               {slipOrder.slipUrl?.toLowerCase().endsWith(".pdf") ? (
                 <a
                   href={media(slipOrder.slipUrl)}
@@ -238,6 +274,7 @@ export default function AdminOrdersPage() {
                   className="btn btn--sm btn--quiet"
                   style={{ margin: "var(--space-md) auto" }}
                 >
+                  เปิดสลิปเป็น PDF
                 </a>
               ) : (
                 slipOrder.slipUrl && (
@@ -247,21 +284,65 @@ export default function AdminOrdersPage() {
               )}
             </div>
             {slipOrder.status === "PENDING_VERIFY" && (
-              <div className="mt-[var(--space-md)] flex gap-[var(--space-xs)]">
+              <div className="adm-acts mt-4">
                 <button
                   type="button"
                   onClick={() => updateStatus(slipOrder, "PAID")}
                   className="btn btn--primary flex-1"
                 >
+                  อนุมัติสลิป
                 </button>
                 <button
                   type="button"
-                  onClick={() => reject(slipOrder)}
+                  onClick={() => askReject(slipOrder)}
                   className="btn btn--quiet flex-1"
                 >
+                  ปฏิเสธสลิป
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* reject dialog: the reason is a square textarea, shown to the customer */}
+      {rejectTarget && (
+        <div className="modal-scrim" onClick={() => setRejectTarget(null)}>
+          <div className="modal adm-slip-modal" role="dialog" aria-modal="true" aria-labelledby="reject-title" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between gap-4">
+              <h2 id="reject-title">ปฏิเสธสลิปของ {orderNo(rejectTarget.id)}</h2>
+              <button type="button" onClick={() => setRejectTarget(null)} className="icon-btn" aria-label="ปิดหน้าต่าง">
+                <X size={18} weight="bold" aria-hidden="true" />
+              </button>
+            </div>
+            <div className="adm-reject mt-4">
+              <div>
+                <label className="label" htmlFor="reject-reason">เหตุผลที่สลิปไม่ผ่าน ลูกค้าจะเห็นข้อความนี้</label>
+                <textarea
+                  id="reject-reason"
+                  rows={3}
+                  autoFocus
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  className="field"
+                  placeholder="เช่น ยอดเงินในสลิปไม่ตรงกับยอดคำสั่งซื้อ"
+                />
+              </div>
+              <div className="adm-acts justify-end">
+                <button type="button" onClick={() => setRejectTarget(null)} className="btn btn--sm btn--quiet">
+                  ยกเลิก
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmReject}
+                  disabled={!rejectReason.trim() || busyId === rejectTarget.id}
+                  className="btn btn--sm"
+                  aria-busy={busyId === rejectTarget.id}
+                >
+                  ยืนยันการปฏิเสธ
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
