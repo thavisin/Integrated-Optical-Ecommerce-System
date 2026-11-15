@@ -65,59 +65,57 @@ function ProductsContent() {
 
   return (
     <div className="container" style={{ paddingBlock: "var(--space-2xl) var(--section-gap-s)" }}>
-      <div className="flex flex-wrap items-end justify-between gap-[var(--space-md)]">
+      <h1>สินค้าทั้งหมดของร้าน</h1>
+
+      <div className="toolbar mt-[var(--space-md)]">
+        <form onSubmit={onSearch} role="search" className="search-group">
+          <label htmlFor="products-search" className="visually-hidden">ค้นหาสินค้า</label>
+          <input
+            id="products-search"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="ค้นหาชื่อหรือแบรนด์"
+            className="field field-sm"
+          />
+          <button className="btn btn--sm btn--quiet">ค้นหา</button>
+        </form>
+
+        <span className="divider-v" aria-hidden="true" />
+
         <div>
-          <h1>สินค้าทั้งหมดของร้าน</h1>
-          <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
-            {search ? `ผลการค้นหาสำหรับ "${search}" พบ ${total} รายการ` : `มีสินค้าในสต็อก ${total} รายการ`}
-          </p>
+          <label htmlFor="products-category" className="visually-hidden">กรองตามหมวดหมู่</label>
+          <select
+            id="products-category"
+            value={category}
+            onChange={(e) => updateParam("category", e.target.value)}
+            className="field field-sm"
+          >
+            <option value="">ทุกหมวดหมู่</option>
+            {CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="products-sort" className="visually-hidden">เรียงลำดับ</label>
+          <select
+            id="products-sort"
+            value={sort}
+            onChange={(e) => updateParam("sort", e.target.value)}
+            className="field field-sm"
+          >
+            <option value="newest">มาใหม่ก่อน</option>
+            <option value="price_asc">ราคาน้อยไปมาก</option>
+            <option value="price_desc">ราคามากไปน้อย</option>
+            <option value="name">ชื่อก่อนหน้าหลัง</option>
+          </select>
         </div>
 
-        <div className="flex flex-wrap items-center gap-[var(--space-xs)]">
-          <form onSubmit={onSearch} role="search" className="flex items-center gap-[var(--space-2xs)]">
-            <label htmlFor="products-search" className="visually-hidden">ค้นหาสินค้า</label>
-            <input
-              id="products-search"
-              
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="ค้นหาชื่อหรือแบรนด์"
-              className="field field-sm"
-              style={{ width: "13rem" }}
-            />
-            <button className="btn btn--sm btn--quiet">ค้นหา</button>
-          </form>
-          <div>
-            <label htmlFor="products-category" className="visually-hidden">กรองตามหมวดหมู่</label>
-            <select
-              id="products-category"
-              value={category}
-              onChange={(e) => updateParam("category", e.target.value)}
-              className="field field-sm"
-            >
-              <option value="">ทุกหมวดหมู่</option>
-              {CATEGORIES.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="products-sort" className="visually-hidden">เรียงลำดับ</label>
-            <select
-              id="products-sort"
-              value={sort}
-              onChange={(e) => updateParam("sort", e.target.value)}
-              className="field field-sm"
-            >
-              <option value="newest">มาใหม่ก่อน</option>
-              <option value="price_asc">ราคาน้อยไปมาก</option>
-              <option value="price_desc">ราคามากไปน้อย</option>
-              <option value="name">ชื่อก่อนหน้าหลัง</option>
-            </select>
-          </div>
-        </div>
+        <p className="num ml-auto whitespace-nowrap text-sm" style={{ color: "var(--color-muted)" }}>
+          {search ? `ผลการค้นหา "${search}" พบ ${total} รายการ` : `พบ ${total} รายการ`}
+        </p>
       </div>
 
       {error ? (

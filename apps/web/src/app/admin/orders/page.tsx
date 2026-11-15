@@ -87,7 +87,7 @@ export default function AdminOrdersPage() {
       {notice && <div className="noty" role="status">{notice}</div>}
       {error && <ErrorBanner message={error} />}
 
-      <div className="seg flex-wrap" role="group" aria-label="กรองคำสั่งซื้อตามสถานะ">
+      <div className="seg seg--tabs" role="group" aria-label="กรองคำสั่งซื้อตามสถานะ">
         {FILTER_TABS.map((t) => (
           <button
             key={t.value}
