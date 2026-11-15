@@ -9,26 +9,80 @@ import { THB, categoryLabel } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
 import { Spinner, EmptyState } from "@/components/ui";
 
+function QtyStepper({
+  labelId,
+  qty,
+  max,
+  out,
+  onChange,
+}: {
+  labelId: string;
+  qty: number;
+  max: number;
+  out: boolean;
+  onChange: (n: number) => void;
+}) {
+  return (
+    <div className="stepper">
+      <span className="visually-hidden" id={labelId}>
+        จำนวนที่ต้องการ
+      </span>
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(1, qty - 1))}
+        disabled={out}
+        aria-label="ลดจำนวน"
+        aria-labelledby={labelId}
+        className="icon-btn"
+      >
+        −
+      </button>
+      <output htmlFor={labelId} className="num" aria-live="polite">
+        {qty}
+      </output>
+      <button
+        type="button"
+        onClick={() => onChange(Math.min(max, qty + 1))}
+        disabled={out}
+        aria-label="เพิ่มจำนวน"
+        aria-labelledby={labelId}
+        className="icon-btn"
+      >
+        +
+      </button>
+    </div>
+  );
+}
+
 function ProductDetailContent() {
   const params = useParams();
   const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const router = useRouter();
   const { add } = useCart();
 
-  const [product, setProduct] = useState<Product | null>(null);
   const [qty, setQty] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loaded, setLoaded] = useState<{ id: string; product: Product } | null>(null);
+  const [failed, setFailed] = useState<{ id: string; message: string } | null>(null);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
+    let alive = true;
     api(`/api/products/${id}`)
-      .then((d) => setProduct(d.product))
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .then((d) => {
+        if (alive) setLoaded({ id, product: d.product });
+      })
+      .catch((e) => {
+        if (alive) setFailed({ id, message: e.message });
+      });
+    return () => {
+      alive = false;
+    };
   }, [id]);
+
+  const error = failed && failed.id === id ? failed.message : "";
+  const product = loaded && loaded.id === id ? loaded.product : null;
+  const loading = !error && !product;
 
   if (loading) return <Spinner label="กำลังโหลดรายละเอียดสินค้า" />;
   if (error || !product)
@@ -50,102 +104,111 @@ function ProductDetailContent() {
   };
 
   return (
-    <div className="container" style={{ paddingBlock: "var(--space-lg) var(--section-gap-s)" }}>
-      <nav className="breadcrumb" aria-label="เส้นทางหน้าเว็บ">
+    <div className="container shop-detail">
+      <nav className="shop-crumb small" aria-label="เส้นทางหน้าเว็บ">
         <Link href="/">หน้าแรก</Link>
-        {" / "}
+        <span aria-hidden="true">/</span>
         <Link href="/products">สินค้าทั้งหมด</Link>
-        {" / "}
+        <span aria-hidden="true">/</span>
         <span aria-current="page">{product.name}</span>
       </nav>
 
-      <div className="mt-[var(--space-lg)] grid gap-[var(--section-gap-s)] md:grid-cols-2">
-        <figure className="card overflow-hidden" style={{ margin: 0 }}>
-          <div className="frame" style={{ aspectRatio: "4 / 3", height: "auto", borderRadius: "var(--radius-card)" }}>
-            {product.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={media(product.imageUrl)} alt={product.name} width={800} height={600} />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center" aria-hidden="true">
-                <span className="wordmark" style={{ color: "var(--color-rule)" }}>OptiMart</span>
-              </span>
-            )}
-          </div>
-        </figure>
+      <div className="shop-detail-grid">
+        <div className="frame shop-detail-frame">
+          {product.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={media(product.imageUrl)} alt={product.name} width={800} height={800} />
+          ) : (
+            <span className="shop-frame-empty" aria-hidden="true">
+              <span className="wordmark">OptiMart</span>
+            </span>
+          )}
+        </div>
 
-        <div className="stack-lg">
+        <div className="shop-detail-body">
           <div>
-            <p className="text-sm" style={{ color: "var(--color-muted)" }}>
-              {categoryLabel(product.category)} แบรนด์ {product.brand || "OptiMart"}
-            </p>
-            <h1 className="mt-[var(--space-2xs)]" style={{ fontSize: "var(--text-2xl)" }}>{product.name}</h1>
+            <p className="small">แบรนด์ {product.brand || "OptiMart"}</p>
+            <h1 className="shop-detail-title mt-2">{product.name}</h1>
           </div>
 
-          <p className="num" style={{ fontSize: "var(--text-3xl)", fontWeight: 500, color: "var(--color-ink)" }}>
-            {THB(product.price)}
-          </p>
+          <div className="well shop-detail-well">
+            <dl className="rule-list">
+              <div>
+                <dt>หมวดหมู่</dt>
+                <dd>{categoryLabel(product.category)}</dd>
+              </div>
+              <div>
+                <dt>คงเหลือ</dt>
+                <dd className="num">{out ? "หมดชั่วคราว" : `${product.stock} ชิ้น`}</dd>
+              </div>
+              <div>
+                <dt>ราคา</dt>
+                <dd className="num">{THB(product.price)}</dd>
+              </div>
+            </dl>
+          </div>
 
-          <p className="text-sm" style={{ color: out ? "var(--color-muted)" : "var(--color-accent-deep)" }}>
-            {out ? "สินค้าหมดชั่วคราว พบกันรอบหน้า" : `คงเหลือในสต็อก ${product.stock} ชิ้น`}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-[var(--space-md)]">
-            <div className="flex items-center" style={{ border: "1px solid var(--color-rule)", borderRadius: "var(--radius-input)" }}>
-              <span className="visually-hidden" id="qty-label">จำนวนที่ต้องการ</span>
+          <div className="shop-buy">
+            <QtyStepper
+              labelId="detail-qty"
+              qty={qty}
+              max={product.stock}
+              out={out}
+              onChange={setQty}
+            />
+            <div className="shop-buy-actions">
               <button
                 type="button"
-                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                onClick={() => handleAdd(false)}
                 disabled={out}
-                aria-label="ลดจำนวน"
-                aria-labelledby="qty-label"
-                className="icon-btn"
-                style={{ width: "2.75rem", height: "2.75rem", fontSize: "var(--text-lg)" }}
+                className="btn btn--primary"
               >
-                −
+                {added ? "เพิ่มแล้วในตะกร้า" : "หยิบลงตะกร้า"}
               </button>
-              <output htmlFor="qty-label" className="num" style={{ minWidth: "2.5rem", textAlign: "center", fontSize: "var(--text-md)" }} aria-live="polite">
-                {qty}
-              </output>
               <button
                 type="button"
-                onClick={() => setQty((q) => Math.min(product.stock, q + 1))}
+                onClick={() => handleAdd(true)}
                 disabled={out}
-                aria-label="เพิ่มจำนวน"
-                aria-labelledby="qty-label"
-                className="icon-btn"
-                style={{ width: "2.75rem", height: "2.75rem", fontSize: "var(--text-lg)" }}
+                className="btn btn--secondary"
               >
-                +
+                สั่งซื้อทันที
               </button>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-[var(--space-xs)]">
-            <button
-              type="button"
-              onClick={() => handleAdd(false)}
-              disabled={out}
-              className="btn btn--quiet"
-            >
-              {added ? "เพิ่มแล้วในตะกร้า" : "หยิบลงตะกร้า"}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAdd(true)}
-              disabled={out}
-              className="btn btn--primary"
-            >
-              สั่งซื้อทันที
-            </button>
-          </div>
-
-          <section className="card p-[var(--space-lg)]" aria-labelledby="detail-desc">
-            <h2 id="detail-desc" style={{ fontSize: "var(--text-title)" }}>รายละเอียดสินค้า</h2>
-            <p className="mt-[var(--space-sm)] whitespace-pre-line text-sm leading-relaxed" style={{ color: "var(--color-ink-2)" }}>
+          <section className="shop-desc" aria-labelledby="detail-desc">
+            <h2 id="detail-desc">รายละเอียดสินค้า</h2>
+            <p className="shop-desc-text">
               {product.description || "รายละเอียดจะเพิ่มเร็ว ๆ นี้"}
             </p>
           </section>
         </div>
+      </div>
+
+      <div className="shop-buybar">
+        <QtyStepper
+          labelId="bar-qty"
+          qty={qty}
+          max={product.stock}
+          out={out}
+          onChange={setQty}
+        />
+        <button
+          type="button"
+          onClick={() => handleAdd(false)}
+          disabled={out}
+          className="btn btn--primary"
+        >
+          {added ? "เพิ่มแล้วในตะกร้า" : "หยิบลงตะกร้า"}
+        </button>
+        <button
+          type="button"
+          onClick={() => handleAdd(true)}
+          disabled={out}
+          className="btn btn--secondary"
+        >
+          สั่งซื้อทันที
+        </button>
       </div>
     </div>
   );
