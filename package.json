@@ -12,7 +12,9 @@
     "dev:server": "npm run dev --workspace @optimart/server",
     "dev:web": "npm run dev --workspace @optimart/web",
     "build": "npm run build --workspace @optimart/web",
-    "deploy": "npm run deploy --workspace @optimart/server && npm run deploy --workspace @optimart/web"
+    "deploy": "node deploy.mjs",
+    "deploy:check": "node deploy.mjs --dry-run",
+    "seed:remote": "npm run seed:remote --workspace @optimart/server"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

@@ -117,35 +117,14 @@ npm run dev
 
 ## ☁️ Deploy ขึ้น Cloudflare Workers
 
-ต้องมีบัญชี Cloudflare และล็อกอิน Wrangler ก่อน (คำสั่งทั้งหมดรันจากรากโปรเจกต์ ยกเว้นที่ระบุ)
+ดูขั้นตอนเต็มใน [DEPLOY.md](DEPLOY.md) — สรุป (รันที่รากโปรเจกต์):
 
 ```bash
-# 1) ล็อกอิน Cloudflare
 npx wrangler login
-
-# 2) ตั้ง JWT secret ของ Worker (รันใน apps/server)
-cd apps/server
-npx wrangler secret put JWT_SECRET
-cd ../..
-
-# 3) ตั้งค่า CORS_ORIGIN ใน apps/server/wrangler.jsonc ให้เป็น URL ของเว็บหลัง deploy
-#    เช่น "https://optimart-web.<your-subdomain>.workers.dev"
-
-# 4) ตั้ง NEXT_PUBLIC_API_URL ก่อน build เว็บ (ค่าเดียวกับ URL ของ API Worker)
-#    เช่น https://optimart-api.<your-subdomain>.workers.dev
-
-# 5) deploy API + เว็บ (API ก่อน แล้ว apply D1 migration บน remote ตามด้วยเว็บ)
-npm run deploy
-
-# 6) ใส่ข้อมูลตัวอย่างบน remote (ไม่บังคับ — จะลบข้อมูลเดิมทั้งหมด)
-npm run seed:remote --workspace @optimart/server
+npm run deploy:check   # dry run ทั้ง 2 Workers (ไม่อัปโหลด)
+npm run deploy        # deploy API (สร้าง D1/R2 อัตโนมัติ + migration + JWT_SECRET) แล้ว deploy เว็บ
+npm run seed:remote   # (ไม่บังคับ, ครั้งแรก) ข้อมูลตัวอย่าง — ลบข้อมูลเดิมทั้งหมด
 ```
-
-หมายเหตุการ deploy:
-- ครั้งแรก `wrangler deploy` จะสร้าง D1 database `optimart-db` และ R2 bucket `optimart-uploads` ให้อัตโนมัติ แล้วเติม id กลับไปใน `wrangler.jsonc` — ไม่ต้องสร้างเอง
-- `npm run deploy` ของ server คือ `wrangler deploy` + `wrangler d1 migrations apply optimart-db --remote`
-- ถ้า deploy เฉพาะ API: `npm run deploy --workspace @optimart/server`
-- เปลี่ยน `CORS_ORIGIN` ให้ตรงกับ origin ของเว็บ (รองรับหลาย origin คั่นด้วย comma) และตั้ง `NEXT_PUBLIC_API_URL` ตอน build เว็บ
 
 ## 📝 หมายเหตุ
 
