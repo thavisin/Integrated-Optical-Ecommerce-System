@@ -224,12 +224,14 @@ select.field { appearance: none; background-image: linear-gradient(45deg, transp
 .frame > img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.85) contrast(0.94); }
 .frame--card { border-radius: var(--radius-card) var(--radius-card) 0 0; }
 
-/* filter toolbar: แถบเครื่องมือกรองหนึ่งแถบ ชิ้นเดียวกัน */
+/* filter toolbar: แถบเครื่องมือกรอง หุ้มพอดีเนื้อหา ไม่ยืดเต็มความกว้าง */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-xs);
+  width: fit-content;
+  max-width: 100%;
   background: var(--color-paper-2);
   border-radius: var(--radius-card);
   padding: var(--space-xs) var(--space-sm);

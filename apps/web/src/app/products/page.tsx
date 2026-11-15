@@ -113,7 +113,9 @@ function ProductsContent() {
           </select>
         </div>
 
-        <p className="num ml-auto whitespace-nowrap text-sm" style={{ color: "var(--color-muted)" }}>
+        <span className="divider-v" aria-hidden="true" />
+
+        <p className="num whitespace-nowrap text-sm" style={{ color: "var(--color-muted)" }}>
           {search ? `ผลการค้นหา "${search}" พบ ${total} รายการ` : `พบ ${total} รายการ`}
         </p>
       </div>
