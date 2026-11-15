@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ShoppingCart, CaretDown } from "@phosphor-icons/react";
@@ -12,19 +12,25 @@ const NAV_LINKS = [
   { href: "/products", label: "สินค้าทั้งหมด" },
 ];
 
+const noopSubscribe = () => () => {};
+
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const { count } = useCart();
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [menuPath, setMenuPath] = useState(pathname);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // ให้เฟรมแรกของ client เหมือน SSR เสมอ แล้วค่อยเผยส่วนที่อ่าน localStorage
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
 
-  useEffect(() => setMenuOpen(false), [pathname]);
+  // ปิดเมนูเมื่อเปลี่ยนหน้า (ปรับ state ระหว่าง render แทน effect)
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
+    setMenuOpen(false);
+  }
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
@@ -40,7 +46,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="nav">
+    <header className={`nav ${pathname.startsWith("/admin") ? "nav--flat" : "nav--pill"}`}>
       <div className="container nav-inner">
         <Link href="/" className="wordmark" aria-label="OptiMart, กลับหน้าแรก">
           OptiMart
@@ -71,21 +77,7 @@ export default function Navbar() {
                 aria-expanded={menuOpen}
                 aria-haspopup="menu"
               >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "1.5rem",
-                    height: "1.5rem",
-                    borderRadius: "var(--radius-pill)",
-                    background: "var(--color-accent-soft)",
-                    color: "var(--color-accent-deep)",
-                    fontSize: "var(--text-xs)",
-                    fontWeight: 500,
-                  }}
-                >
+                <span className="avatar" aria-hidden="true">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
                 <span className="hidden max-w-[7rem] truncate sm:block">{user.name}</span>
@@ -111,24 +103,7 @@ export default function Navbar() {
           <Link href="/cart" className="icon-btn" aria-label={`ตะกร้าสินค้า มีสินค้า ${count} ชิ้น`}>
             <ShoppingCart size={20} weight="bold" aria-hidden="true" />
             {count > 0 && (
-              <span
-                className="num"
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  top: "var(--space-3xs)",
-                  right: "var(--space-3xs)",
-                  minWidth: "1.1rem",
-                  padding: "0 0.2rem",
-                  borderRadius: "var(--radius-pill)",
-                  background: "var(--color-accent)",
-                  color: "var(--color-accent-ink)",
-                  fontFamily: "var(--font-outlier)",
-                  fontSize: "var(--text-xs)",
-                  lineHeight: "1.1rem",
-                  textAlign: "center",
-                }}
-              >
+              <span className="count num" aria-hidden="true">
                 {count}
               </span>
             )}

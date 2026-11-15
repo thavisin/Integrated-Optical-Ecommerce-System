@@ -30,15 +30,15 @@ interface StatusMeta {
   step: number; // -1 = ไม่อยู่ใน timeline ปกติ
 }
 
-/* Dose: สัญญาณเขียวเดียว (สำเร็จ/ชำระแล้ว) · state ที่รออยู่หรือไม่ผ่านเป็นสีเทา */
+/* Solstice: vermilion only where the owner must act (PENDING_VERIFY) and REJECTED as outline; paid/shipped in ink, completed in gold hairline, owed/cancelled muted */
 export const ORDER_STATUS: Record<string, StatusMeta> = {
-  AWAITING_PAYMENT: { label: "รอโอนเงินและสลิป", chip: "chip--outline", step: 0 },
-  PENDING_VERIFY: { label: "รอตรวจสอบสลิป", chip: "chip--outline", step: 1 },
-  PAID: { label: "ชำระเงินแล้ว", chip: "chip--ok", step: 2 },
+  AWAITING_PAYMENT: { label: "รอโอนเงินและสลิป", chip: "chip--muted", step: 0 },
+  PENDING_VERIFY: { label: "รอตรวจสอบสลิป", chip: "chip--signal", step: 1 },
+  PAID: { label: "ชำระเงินแล้ว", chip: "chip--outline", step: 2 },
   SHIPPED: { label: "จัดส่งแล้ว", chip: "chip--ink", step: 3 },
-  COMPLETED: { label: "สำเร็จ", chip: "chip--mint", step: 4 },
-  REJECTED: { label: "สลิปไม่ถูกต้อง", chip: "", step: -1 },
-  CANCELLED: { label: "ยกเลิกแล้ว", chip: "chip--outline", step: -1 },
+  COMPLETED: { label: "สำเร็จ", chip: "chip--gold", step: 4 },
+  REJECTED: { label: "สลิปไม่ถูกต้อง", chip: "chip--outline chip--signal-line", step: -1 },
+  CANCELLED: { label: "ยกเลิกแล้ว", chip: "chip--muted", step: -1 },
 };
 
 export const ORDER_TIMELINE_STEPS = [

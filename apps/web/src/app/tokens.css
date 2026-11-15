@@ -1,85 +1,41 @@
+/* Solstice tokens (scaffold output, long-light) exposed to Tailwind: bg-paper, text-ink, border-rule, font-display, text-sm, rounded-pill, shadow-card ...
+ * Tailwind's stock palette is cleared so only these colours generate utilities. */
 @theme static {
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.2rem;
-  --text-xl: 1.44rem;
-  --text-2xl: 1.728rem;
-  --text-3xl: 2.074rem;
-  --text-display-s: 1.44rem;
-  --text-display: 1.728rem;
-  --text-section: 1.2rem;
-  --text-title: 1rem;
-  --text-lead: 1rem;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --color-error: oklch(52% 0.19 27);
-  --color-success: oklch(50% 0.12 150);
-  --color-paper: oklch(97.6% 0.011 88);
-  --color-paper-2: oklch(96.5% 0.02 160);
-  --color-paper-3: oklch(93% 0.036 160);
-  --color-ink: oklch(21% 0.025 170);
-  --color-ink-2: oklch(31% 0.02 170);
-  --color-muted: oklch(49% 0.024 165);
-  --color-rule: oklch(86.5% 0.022 140);
-  --color-accent: oklch(50% 0.13 160);
-  --color-accent-deep: oklch(42% 0.11 162);
-  --color-accent-soft: oklch(88% 0.08 160);
-  --color-accent-ink: oklch(99% 0.006 160);
-  --color-focus: oklch(45% 0.14 160);
-  --font-display: "IBM Plex Sans Thai", "IBM Plex Sans", ui-sans-serif, sans-serif;
-  --font-body: "IBM Plex Sans Thai", "IBM Plex Sans", ui-sans-serif, sans-serif;
-  --font-outlier: "IBM Plex Mono", ui-monospace, monospace;
-  --radius-card: 14px;
-  --radius-input: 10px;
-  --radius-pill: 999px;
-  --shadow-card: 0 1px 2px oklch(30% 0.03 165 / 0.08), 0 24px 48px -24px oklch(40% 0.08 165 / 0.35);
-  --shadow-lift: 0 1px 1px oklch(30% 0.03 165 / 0.10), 8px 18px 28px -14px oklch(36% 0.06 165 / 0.32), 18px 40px 60px -30px oklch(40% 0.08 165 / 0.30);
-  --shadow-raise: 0 1px 2px oklch(30% 0.03 165 / 0.08);
-  --shadow-menu: 0 1px 2px oklch(30% 0.03 165 / 0.08), 0 12px 24px -12px oklch(40% 0.08 165 / 0.25);
-  --tracking-display: -0.01em;
+  --color-*: initial;
+  --color-paper: oklch(94% 0.03 80); --color-paper-2: oklch(97% 0.02 85); --color-paper-3: oklch(89% 0.05 80);
+  --color-ink: oklch(27% 0.05 50); --color-ink-2: oklch(36% 0.05 50); --color-muted: oklch(48% 0.06 55);
+  --color-rule: oklch(84% 0.06 78);
+  --color-accent: oklch(54% 0.20 24); --color-accent-2: oklch(48% 0.20 24); --color-accent-ink: oklch(97% 0.02 85); --color-focus: oklch(54% 0.20 24);
+  --color-gold: oklch(74% 0.14 75); --color-gold-2: oklch(84% 0.11 80); --color-slot: var(--color-gold);
+  --color-error: oklch(52% 0.19 27); --color-success: oklch(50% 0.12 150);
+  --font-display: "Yeseva One", "Chonburi", ui-serif, Georgia, serif; --font-body: "Archivo", "Anuphan", ui-sans-serif, sans-serif;
+  --font-outlier: "Archivo Narrow", "Anuphan", ui-sans-serif, sans-serif;
+  --default-font-family: var(--font-body); --default-mono-font-family: var(--font-body);
+  --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem; --text-xl: 1.5625rem; --text-2xl: 1.953rem; --text-3xl: 2.441rem;
+  --text-display-s: clamp(2.25rem, 4vw + 0.5rem, 3.75rem); --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
+  --text-section: clamp(2rem, 2.5vw + 1rem, 3.5rem); --text-title: clamp(1.25rem, 0.75vw + 0.875rem, 1.625rem); --text-lead: clamp(1.125rem, 0.35vw + 1rem, 1.375rem);
+  /* one 4px unit, so p-1=4 (2xs), p-2=8 (xs), p-3=12 (sm), p-4=16 (md), p-6=24 (lg), p-10=40 (xl), p-16=64 (2xl), p-24=96 (3xl), p-36=144 (4xl).
+   * ponytail: named --spacing-lg keys would shadow max-w-lg/max-w-3xl (Tailwind reads --spacing before --container); add them only after those pages move off max-w-* */
+  --spacing: 4px;
+  --radius-card: 0; --radius-pill: 999px; --radius-nav: 1.75rem;
+  --shadow-card: 10px 10px 0 var(--color-paper-3);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 :root {
   color-scheme: light;
-  --space-3xs: 2px;
-  --space-2xs: 4px;
-  --space-xs: 8px;
-  --space-sm: 12px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 40px;
-  --space-2xl: 64px;
-  --space-3xl: 96px;
-  --space-4xl: 144px;
-  --dur-micro: 120ms;
-  --dur-short: 220ms;
-  --dur-long: 420ms;
-  --container: 1440px;
-  --gutter: 64px;
-  --gap-columns: 32px;
-  --section-gap-s: 120px;
-  --section-gap: 144px;
-  --section-gap-l: 176px;
-  --z-base: 1;
-  --z-raised: 10;
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-sticky-nav: 300;
-  --z-modal: 400;
-  --z-toast: 500;
-  --z-tooltip: 600;
-  --p-mon: oklch(85% 0.052 22);
-  --p-tue: oklch(87.5% 0.058 64);
-  --p-wed: oklch(91.5% 0.064 98);
-  --p-thu: oklch(86.5% 0.075 160);
-  --p-fri: oklch(87% 0.048 210);
-  --p-sat: oklch(84% 0.045 270);
-  --p-sun: oklch(84% 0.048 322);
-  --light: oklch(99.4% 0.016 84);
-  --glint: oklch(100% 0 0);
-  --rule-hair: 1px;
-  --display-weight: 700;
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
+  --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
+  --container: 1440px; --gutter: 64px; --gap-columns: 32px; --section-gap-s: 120px; --section-gap: 144px; --section-gap-l: 176px;
+  --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
+  --rule-hair: 1px; --rule-bar: 2px;
+  --tracking-display: -0.005em; --display-weight: 400;
+  --control-h: 48px; --control-h-sm: 44px;
 }
-@media (max-width: 60rem) { :root { --gutter: 24px; --section-gap-s: 80px; --section-gap: 96px; --section-gap-l: 120px; } }
-@media (max-width: 40rem) { :root { --gutter: 16px; --section-gap-s: 56px; --section-gap: 72px; --section-gap-l: 96px; --gap-columns: 16px; } }
+/* app screens (/admin; Task 4 sets data-scope="app" on its shell): fixed scale, ratio 1.2, no fluid heads, 40/36px controls */
+[data-scope="app"] {
+  --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.2rem; --text-xl: 1.44rem; --text-2xl: 1.728rem; --text-3xl: 2.074rem;
+  --text-display-s: 1.728rem; --text-display: 2.074rem; --text-section: 1.44rem; --text-title: 1.2rem; --text-lead: 1rem;
+  --control-h: 40px; --control-h-sm: 36px;
+}
+/* ponytail: Dose-era names still read by page inline styles; Tasks 2-4 stop using them, Task 5 deletes this block */
+:root { --color-accent-deep: var(--color-accent); --color-accent-soft: var(--color-paper-3); --radius-input: 0; }
