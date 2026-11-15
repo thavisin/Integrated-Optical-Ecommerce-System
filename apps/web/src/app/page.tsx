@@ -131,12 +131,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* bento: หมวดหมู่สี่ช่อง กับสินค้ามาใหม่ในเซลล์ไม่เท่ากัน */}
+      {/* bento: หมวดหมู่สี่ช่องก่อน แล้วจึงหัวข้อสินค้ามาใหม่และเซลล์สินค้าที่ไม่เท่ากัน */}
       <section className="container section" aria-labelledby="home-new">
-        <div className="shop-store-head">
-          <h2 id="home-new">สินค้ามาใหม่ในร้าน</h2>
-          <Link href="/products" className="btn btn--sm btn--secondary">ดูสินค้าทั้งหมดของร้าน</Link>
-        </div>
         <h2 id="home-categories" className="visually-hidden">เลือกตามหมวดหมู่</h2>
         <div className="shop-bento">
           {CATEGORIES.map((c, i) => (
@@ -151,6 +147,10 @@ export default function HomePage() {
               <span className="shop-cell-label">{c.label}</span>
             </Link>
           ))}
+          <div className="shop-store-head">
+            <h2 id="home-new">สินค้ามาใหม่ในร้าน</h2>
+            <Link href="/products" className="btn btn--sm btn--secondary">ดูสินค้าทั้งหมดของร้าน</Link>
+          </div>
           {loading ? (
             <div className="shop-bento-spinner">
               <Spinner label="กำลังโหลดสินค้า" />

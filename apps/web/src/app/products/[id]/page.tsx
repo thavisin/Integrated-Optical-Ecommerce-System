@@ -150,7 +150,7 @@ function ProductDetailContent() {
 
           <div className="shop-buy">
             <QtyStepper
-              labelId="detail-qty"
+              labelId="qty-label"
               qty={qty}
               max={product.stock}
               out={out}

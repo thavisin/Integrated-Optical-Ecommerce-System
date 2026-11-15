@@ -1,6 +1,8 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 /** fetch wrapper — แนบ JWT อัตโนมัติ + แปลง error message จาก API */
+// the default generic keeps every existing call site untyped on purpose; each caller narrows its own payload
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function api<T = any>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = { ...(options.headers as Record<string, string>) };
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -15,7 +17,8 @@ export async function api<T = any>(path: string, options: RequestInit = {}): Pro
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     }
-    throw new Error((data as any)?.message || `เกิดข้อผิดพลาด (${res.status})`);
+    const message = data && typeof data === "object" && "message" in data ? String(data.message) : "";
+    throw new Error(message || `เกิดข้อผิดพลาด (${res.status})`);
   }
   return data as T;
 }

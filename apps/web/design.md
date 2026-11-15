@@ -28,7 +28,6 @@ The locked system. Every Hallmark run reads this first, and every page uses it. 
 - Vermilion sits at hue 24 and never goes past 28. It marks the primary button, the focus ring, the current tab or nav item, and one figure, and covers under 5% of a screen. It never fills a section. Gold rules lines and never colours text.
 - Space: `--space-3xs`…`--space-4xl` (2, 4, 8, 12, 16, 24, 40, 64, 96, 144 px). Type: `--text-xs`…`--text-3xl`, plus fluid `--text-display`, `--text-section`, `--text-title` and `--text-lead`. Motion: `--dur-micro`, `--dur-short` and `--ease-out`, used on transform, opacity and colour only.
 - **App scope:** put `data-scope="app"` on the admin shell. It switches to a fixed 1.2-ratio type scale (no fluid heads) and 40/36px controls.
-- **Dose aliases** (`--color-accent-deep`, `--color-accent-soft`, `--radius-input`) are there only so old inline styles keep working. New code must not use them. Task 5 deletes them.
 
 ## Tailwind usage
 - Use Tailwind utilities for layout and spacing, and only with token values: `flex`, `grid`, `gap-4`, `mt-6`, `md:grid-cols-2`, `bg-paper-2`, `text-ink`, `text-muted`, `border-rule`, `font-display`, `text-sm`, `rounded-pill`, `shadow-card`.
@@ -81,8 +80,6 @@ Every control has eight states: rest, `:hover`, `:active`, `:focus-visible` (a 2
 | `.swatch` | 0.75rem square colour key, coloured inline with a token | static |
 | `.lead` | intro sentence under a head, `--text-lead`, ink-2, 52ch max | static |
 | `.num` | tabular numerals (`font-variant-numeric: tabular-nums`) for prices, counts and order numbers | static; inside `.tbl` it also forces the body face |
-
-Old classes that are restyled for now and get removed later (do not use them in new markup): `.btn--ink`, `.chip--mint`, `.steps`, `.plastic*`, `.pharm-label`/`.pharm-head`, `.stamp`, `.admin-grid`/`.admin-nav`, `.slip-frame`, `.breadcrumb`, `.divider`.
 
 ## ORDER_STATUS chip map (`src/lib/format.ts`)
 | Status | Chip | Look |

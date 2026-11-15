@@ -40,5 +40,3 @@
   --text-display-s: 1.728rem; --text-display: 2.074rem; --text-section: 1.44rem; --text-title: 1.2rem; --text-lead: 1rem;
   --control-h: 40px; --control-h-sm: 36px;
 }
-/* ponytail: Dose-era names still read by page inline styles; Tasks 2-4 stop using them, Task 5 deletes this block */
-:root { --color-accent-deep: var(--color-accent); --color-accent-soft: var(--color-paper-3); --radius-input: 0; }

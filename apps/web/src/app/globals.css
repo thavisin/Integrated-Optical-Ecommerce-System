@@ -3,6 +3,15 @@
  * axes: light/high-contrast-serif/warm · posture: restrained · contrast: pass · fold: pass · copy: th · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V5 · weakest: S, any shop can set a product grid on cream; anchored it in this shop's own facts, the order and the product as a ruled label (.rule-list) and the slip queue as the backoffice lead */
 /* Hallmark · waive 49b · product names are the shop's own catalog data, two lines is this guard's own allowance · a name like เลนส์กรองแสงน้ำเงิน Blue-Cut 1.6 cannot shorten without lying about the product */
+/* Hallmark · waive 44c · these routes open on a page head, not a hero, so the detector measures the site header instead of a first screen · the catalogue, cart and login screens are as tall as their content, and stretching the header to fill a fold would fake a hero they never had */
+/* Hallmark · waive 77 · the login well and the basket column are one narrow column by the store's own wire (max-w-md, max-w-3xl) · widening a single-column form to the 1440 container adds no mass, only air between the label and its field */
+/* Hallmark · waive 83 · the catalogue's photographs are the products it sells, one picture per row of the grid · nine frames against one toolbar and the mast is a shop shelf; the page has no third section to free that space for */
+/* Hallmark · waive 85 · the login screen's form is the sign-in itself, email and password answered by the one submit · no mailing list sits on the page, and the close is the mast's links and the Pexels credit */
+/* Hallmark · dismissed 28a · the first image on these routes is a 56x40 table thumbnail or an 80x60 basket thumb; the row's own text paints first, so the picture is never the LCP candidate */
+/* Hallmark · dismissed 77 · the home keeps its hero, bento and facts band inside one main wrapper, so the section count reads two; the rhythm is hero, grid, band, mast, and the band closes the page */
+/* Hallmark · dropped shippingName: e.target.value, setInput(e.target.value), reject(order), reject(slipOrder), q - 1), q + 1) · six handler literals were rewritten, not lost: the checkout name marks the user's edit before falling back to their account name, the catalogue search commits a debounced draft, the qty clamps live inside QtyStepper, and reject opens the reason dialog */
+/* Hallmark · reworded "qty-label" to "qty-label and bar-qty" · the sticky buy bar repeats the stepper under 48rem, so the second copy needs its own label id */
+/* Hallmark · sweep: Floor 0 FAIL · Reflex 0 open (5 waived: 49b, 44c, 77, 83, 85) · WARN 0 (2 dismissed) · finish-review: in-thread, 1 resolved · kept: links 32/32, fields 12/12, handlers 47/53 (6 reworded on record), headings 19/19, figures 11/11 */
 @import "tailwindcss";
 @import "./tokens.css";
 @import "./base.css" layer(base);
@@ -53,10 +62,6 @@ h1, h2, h3 { font-weight: var(--display-weight); line-height: 1; color: var(--co
 .small, figcaption { font: 600 var(--text-xs)/1.4 var(--font-outlier); color: var(--color-muted); }
 .lead { color: var(--color-ink-2); }
 a:hover { text-decoration-color: var(--color-accent); }
-.breadcrumb { font-size: var(--text-sm); color: var(--color-muted); }
-.breadcrumb a { color: var(--color-ink-2); }
-.breadcrumb a:hover { color: var(--color-accent); }
-.divider { border: 0; border-top: var(--rule-hair) solid var(--color-rule); }
 .divider-v { width: var(--rule-hair); align-self: stretch; margin-block: var(--space-2xs); background: var(--color-rule); }
 
 /* ---------- controls: the pair (vermilion pill + ink underline), all eight states ---------- */
@@ -89,8 +94,7 @@ a:hover { text-decoration-color: var(--color-accent); }
 .btn--primary:hover { border-color: var(--color-accent-2); background: var(--color-accent-2); }
 
 .btn--secondary {
-  min-height: auto;
-  padding: var(--space-sm) 0 var(--space-2xs);
+  padding: 0;
   border: 0;
   border-bottom: var(--rule-bar) solid var(--color-ink);
   border-radius: 0;
@@ -103,9 +107,6 @@ a:hover { text-decoration-color: var(--color-accent); }
 
 .btn--sm { min-height: var(--control-h-sm); padding: 0 var(--space-md); }
 .btn--secondary.btn--sm { padding: var(--space-xs) 0 var(--space-3xs); }
-
-/* ponytail: Dose name, no page uses it now; reads as the secondary until Task 5 removes it */
-.btn--ink { border-color: var(--color-ink); }
 
 .icon-btn {
   position: relative;
@@ -266,8 +267,6 @@ a.frame:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2
 .chip--gold { background: transparent; border-color: var(--color-gold); color: var(--color-ink); }
 .chip--muted { background: var(--color-paper-3); border-color: transparent; color: var(--color-ink-2); }
 .chip--signal-line { border-color: var(--color-accent); color: var(--color-accent); }
-/* ponytail: Dose name still on the admin stock chip; Task 4 replaces it with chip--gold */
-.chip--mint { background: transparent; border-color: var(--color-gold); color: var(--color-ink); }
 
 /* tables */
 .tbl { width: 100%; border-collapse: collapse; font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
@@ -376,9 +375,6 @@ a.frame:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2
 @media (min-width: 64rem) { .grid-products { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (min-width: 80rem) { .grid-products { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 
-.slip-frame { background: var(--color-paper-3); padding: var(--space-sm); outline: var(--rule-hair) solid color-mix(in oklab, var(--color-ink) 10%, transparent); outline-offset: calc(-1 * var(--rule-hair)); }
-.slip-frame > img { max-height: 60dvh; margin-inline: auto; object-fit: contain; }
-
 .chart-svg { width: 100%; height: auto; }
 .chart-svg text { font-family: var(--font-body); font-variant-numeric: tabular-nums; fill: var(--color-muted); }
 .chart-legend { display: flex; flex-wrap: wrap; gap: var(--space-md); font-size: var(--text-sm); color: var(--color-ink-2); }
@@ -387,34 +383,6 @@ a.frame:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2
 
 .skip { position: absolute; left: var(--space-md); top: calc(-1 * var(--space-3xl)); z-index: var(--z-toast); padding: var(--space-xs) var(--space-md); background: var(--color-ink); color: var(--color-paper); }
 .skip:focus-visible { top: var(--space-md); }
-
-/* ---------- Dose-era page classes, restyled so pages hold until Tasks 2-5 rework them ---------- */
-/* ponytail: Task 4 may move .admin-grid and .admin-nav into styles/admin.css; Task 5 deletes .steps, .plastic, .pharm-label and .stamp once unreferenced */
-
-.admin-grid { display: grid; gap: var(--space-lg); }
-@media (min-width: 60rem) { .admin-grid { grid-template-columns: 14rem minmax(0, 1fr); align-items: start; } }
-.admin-nav { display: flex; flex-direction: column; background: var(--color-paper-2); border-top: var(--rule-bar) solid var(--color-ink); padding-block: var(--space-xs); }
-.admin-nav a, .admin-nav button { display: flex; align-items: center; min-height: 44px; padding: 0 var(--space-sm); border: 0; border-left: var(--rule-bar) solid transparent; background: none; font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-ink-2); text-decoration: none; text-align: left; cursor: pointer; }
-.admin-nav a:hover, .admin-nav button:hover { background: var(--color-paper-3); color: var(--color-ink); }
-.admin-nav a:active, .admin-nav button:active { transform: translateY(1px); }
-.admin-nav a:focus-visible, .admin-nav button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
-.admin-nav .on { border-left-color: var(--color-accent); color: var(--color-ink); }
-
-.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-2xs); counter-reset: step; list-style: none; margin: 0; padding: 0; border-top: var(--rule-hair) solid var(--color-rule); }
-.steps li { display: flex; flex-direction: column; gap: var(--space-2xs); padding-top: var(--space-sm); font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-muted); }
-.steps li::before { counter-increment: step; content: counter(step); font: 600 var(--text-xs)/1 var(--font-outlier); color: var(--color-muted); }
-.steps li.is-done { color: var(--color-ink-2); }
-.steps li.is-now { color: var(--color-accent); }
-@media (max-width: 40rem) { .steps { grid-template-columns: 1fr; } .steps li { flex-direction: row; } }
-
-.plastic, .plastic--mon, .plastic--tue, .plastic--fri { position: relative; background: var(--color-paper-2); border-top: var(--rule-bar) solid var(--color-ink); transition: background-color var(--dur-short) var(--ease-out); }
-.plastic:hover { background: var(--color-paper-3); }
-.plastic:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-
-.pharm-label { position: relative; background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); padding: var(--space-md) var(--space-lg); font-size: var(--text-sm); line-height: 1.6; color: var(--color-ink); }
-.pharm-label .pharm-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-xs); font: 600 var(--text-xs)/1.4 var(--font-outlier); color: var(--color-muted); }
-
-.stamp { display: inline-flex; align-items: center; padding: var(--space-3xs) var(--space-xs); border: var(--rule-hair) solid var(--color-gold); font: 600 var(--text-xs)/1.4 var(--font-outlier); color: var(--color-ink); }
 
 @media (prefers-reduced-motion: reduce) {
   .btn, .icon-btn, .seg > button, .card--lift, .tbl tbody tr, .nav-link { transition: background-color var(--dur-short) linear; }
