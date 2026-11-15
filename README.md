@@ -1,11 +1,11 @@
 # Integrated-Optical-Ecommerce-System
 
-ระบบพาณิชย์อิเล็กทรอนิกส์สำหรับร้านแว่นตา (Integrated Optical E-commerce System) — Monorepo แยก **Frontend (Next.js)** และ **Backend (Node.js + Express + Prisma)**
+ระบบพาณิชย์อิเล็กทรอนิกส์สำหรับร้านแว่นตา (Integrated Optical E-commerce System) — Monorepo แยก **Frontend (Next.js)** และ **Backend (Cloudflare Workers + Hono)** โดยใช้ **D1** เป็นฐานข้อมูล และ **R2** เก็บรูปสินค้า/สลิป
 
 ## ✨ ฟีเจอร์
 
 ### ฐานระบบ (Base)
-- สมัครสมาชิก / เข้าสู่ระบบ ด้วย **JWT** + **bcrypt** (แฮชรหัสผ่าน)
+- สมัครสมาชิก / เข้าสู่ระบบ ด้วย **JWT** + **PBKDF2-SHA256** (แฮชรหัสผ่านด้วย Web Crypto)
 - **Authentication / Authorization** แยกสิทธิ์ `CUSTOMER` และ `ADMIN` (protect ทั้งฝั่ง API และหน้าเว็บ)
 
 ### ฝั่งลูกค้า (Customer)
@@ -25,49 +25,59 @@
 | ส่วน | เทคโนโลยี |
 |---|---|
 | Frontend | Next.js (App Router) + TypeScript + Tailwind CSS + Recharts |
-| Backend | Node.js + Express.js |
-| Database | SQLite ผ่าน Prisma ORM (สลับเป็น PostgreSQL/MySQL ได้ง่าย) |
-| Auth | JWT (jsonwebtoken) + bcrypt |
-| Upload | Multer (สลิปโอนเงิน / รูปสินค้า) |
+| Backend | Cloudflare Workers + Hono (ESM JavaScript) |
+| Database | Cloudflare D1 (SQLite) + Drizzle ORM |
+| Storage | Cloudflare R2 (รูปสินค้า / สลิปโอนเงิน) |
+| Auth | Hono JWT (HS256) + Web Crypto PBKDF2-SHA256 |
+| Upload | Hono `parseBody` (multipart) → R2 |
 
 ## 📁 โครงสร้าง Monorepo
 
 ```
 glasses-market/
 ├── apps/
-│   ├── server/                # Backend (Express API)
-│   │   ├── prisma/            # schema + seed
-│   │   ├── public/uploads/    # สลิป + รูปสินค้า (สร้างตอน runtime)
+│   ├── server/                  # Backend Worker (optimart-api)
+│   │   ├── wrangler.jsonc       # D1 + R2 bindings
+│   │   ├── drizzle/             # SQL migrations (wrangler d1 migrations apply)
+│   │   ├── drizzle.config.js
+│   │   ├── seed/                # build-seed.js, seed.sql, upload-r2.js, uploads/
 │   │   └── src/
-│   │       ├── index.js       # entry point
-│   │       ├── lib/prisma.js
-│   │       ├── middleware/    # auth, upload, error
-│   │       └── routes/        # auth, products, orders, admin
-│   └── web/                   # Frontend (Next.js)
+│   │       ├── index.js         # entry point (Hono)
+│   │       ├── db/              # drizzle schema + client
+│   │       ├── lib/             # password, upload, http error
+│   │       ├── middleware/      # auth, error
+│   │       └── routes/          # auth, products, orders, admin
+│   └── web/                     # Frontend Worker (optimart-web, Next.js)
 │       └── src/
-│           ├── app/           # หน้าเว็บ (customer + admin)
+│           ├── app/             # หน้าเว็บ (customer + admin)
 │           ├── components/
-│           ├── context/       # Auth + Cart
-│           └── lib/           # api client, formatters, types
-├── package.json               # npm workspaces
+│           ├── context/         # Auth + Cart
+│           └── lib/             # api client, formatters, types
+├── package.json                 # npm workspaces
 └── README.md
 ```
 
-## 🚀 การติดตั้งและรัน
+## 🚀 การติดตั้งและรัน (local)
 
 ```bash
 # 1) ติดตั้ง dependencies ทั้งหมดของ monorepo
 npm install
 
-# 2) เตรียม database (prisma generate + db push + seed ข้อมูลตัวอย่าง)
+# 2) ตั้งค่า secret สำหรับ development
+cp apps/server/.dev.vars.example apps/server/.dev.vars
+# แล้วแก้ JWT_SECRET ในไฟล์ apps/server/.dev.vars
+
+# 3) เตรียมฐานข้อมูล local (D1 migration + seed + อัปโหลดไฟล์ตัวอย่างขึ้น R2 local)
 npm run setup
 
-# 3) รันทั้ง backend และ frontend พร้อมกัน
+# 4) รันทั้ง backend และ frontend พร้อมกัน
 npm run dev
 ```
 
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:4000
+- Backend API: http://localhost:4000 (`wrangler dev --port 4000`)
+- คำสั่งแยกส่วน: `npm run dev:server`, `npm run dev:web`
+- ข้อมูล local ทั้งหมด (D1/R2) อยู่ใน `apps/server/.wrangler/` — ลบทิ้งได้ถ้าต้องการเริ่มใหม่
 
 ## 👤 บัญชีทดสอบ (จาก seed)
 
@@ -82,7 +92,7 @@ npm run dev
 ลูกค้าเข้าสู่ระบบ → เลือกสินค้า → หยิบลงตะกร้า → Checkout
 → กรอกที่อยู่จัดส่ง + แนบสลิปโอนเงิน → สร้างคำสั่งซื้อ (สถานะ: รอตรวจสอบ)
 → Admin ตรวจสอบสลิป:
-   ├─ อนุมัติ → ชำระเงินแล้ว → จัดส่งแล้ว → สำเร็จ
+   ├─ อนุมัติ → ชำระเงินแล้ว (หักสต็อก) → จัดส่งแล้ว → สำเร็จ
    └─ ปฏิเสธ (ระบุเหตุผล) → ลูกค้าส่งสลิปใหม่ได้ หรือยกเลิกคำสั่งซื้อ
 ```
 
@@ -103,8 +113,22 @@ npm run dev
 | POST | `/api/orders/:id/slip` | ส่งสลิปใหม่ | เจ้าของ |
 | POST | `/api/orders/:id/cancel` | ยกเลิกคำสั่งซื้อ | เจ้าของ/Admin |
 | GET | `/api/admin/stats` | ข้อมูลสรุปสำหรับ Dashboard | Admin |
+| GET | `/uploads/*` | ไฟล์จาก R2 (`products/*`, `slips/*`) | Public |
+
+## ☁️ Deploy ขึ้น Cloudflare Workers
+
+ดูขั้นตอนเต็มใน [DEPLOY.md](DEPLOY.md) — สรุป (รันที่รากโปรเจกต์):
+
+```bash
+npx wrangler login
+npm run deploy:check   # dry run ทั้ง 2 Workers (ไม่อัปโหลด)
+npm run deploy        # deploy API (สร้าง D1/R2 อัตโนมัติ + migration + JWT_SECRET) แล้ว deploy เว็บ
+npm run seed:remote   # (ไม่บังคับ, ครั้งแรก) ข้อมูลตัวอย่าง — ลบข้อมูลเดิมทั้งหมด
+```
 
 ## 📝 หมายเหตุ
 
-- ไฟล์ `.env` ใน `apps/server` เป็นค่าสำหรับ development (แนะนำเปลี่ยน `JWT_SECRET` ก่อนใช้งานจริง)
-- ระบบตัดสต็อกอัตโนมัติตอน checkout และคืนสต็อกเมื่อคำสั่งซื้อถูกปฏิเสธ/ยกเลิก (ผ่าน Prisma Transaction)
+- `apps/server/.dev.vars` ใช้เก็บ `JWT_SECRET` สำหรับ local (ถูก gitignore) — ตัวอย่างอยู่ใน `.dev.vars.example`
+- seed ใช้ `seed/build-seed.js` สร้าง `seed/seed.sql` (แฮชรหัสผ่านด้วย PBKDF2) แล้วรันผ่าน `wrangler d1 execute --local`
+- ไฟล์ตัวอย่างใน `seed/uploads/` ถูกอัปโหลดขึ้น R2 ด้วย `seed/upload-r2.js` (`--local` เป็นค่าเริ่มต้น, ใส่ `--remote` เมื่อต้องการอัปโหลดจริง)
+- ระบบตัดสต็อกอัตโนมัติตอนแอดมินอนุมัติสลิป (batch เดียวกับการเปลี่ยนสถานะ) และมี `CHECK (stock >= 0)` กันขายเกินในระดับฐานข้อมูล

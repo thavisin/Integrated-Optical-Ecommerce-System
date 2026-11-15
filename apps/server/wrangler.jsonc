@@ -1,0 +1,17 @@
+{
+  // Cloudflare Workers config — ดูสคีมาที่ node_modules/wrangler/config-schema.json
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "optimart-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  // ไม่ต้องใส่ database_id / bucket id ในไฟล์นี้ — `wrangler deploy` จะสร้าง D1 (optimart-db)
+  // และ R2 (optimart-uploads) ให้อัตโนมัติครั้งแรก (automatic resource provisioning)
+  "d1_databases": [
+    { "binding": "DB", "database_name": "optimart-db", "migrations_dir": "drizzle" }
+  ],
+  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "optimart-uploads" }],
+  "vars": {
+    "JWT_EXPIRES_IN": "7d",
+    "CORS_ORIGIN": "http://localhost:3000"
+  }
+}

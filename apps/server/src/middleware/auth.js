@@ -1,42 +1,54 @@
-import jwt from 'jsonwebtoken'
-import { prisma } from '../lib/prisma.js'
+import { eq } from 'drizzle-orm'
+import { sign, verify } from 'hono/jwt'
+import { getDb } from '../db/index.js'
+import { users } from '../db/schema.js'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me'
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d'
+const UNIT_SECONDS = { s: 1, m: 60, h: 3600, d: 86400 }
 
-/** สร้าง JWT จากข้อมูลผู้ใช้ */
-export function signToken(user) {
-  return jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN })
+/** แปลงอายุ token แบบ '7d' / '12h' / '30m' / '3600s' เป็นวินาที (ค่าเริ่มต้น 7 วัน) */
+export function tokenTtlSeconds(expiresIn) {
+  const match = /^(\d+)\s*([smhd])$/.exec(String(expiresIn || '').trim())
+  if (!match) return 7 * UNIT_SECONDS.d
+  return Number(match[1]) * UNIT_SECONDS[match[2]]
 }
 
-/** Authentication — ตรวจว่าแนบ Bearer token ที่ถูกต้องมาหรือไม่ แล้วแนบ req.user */
-export async function authRequired(req, res, next) {
+/** สร้าง JWT (HS256) จากข้อมูลผู้ใช้ */
+export async function signToken(env, user) {
+  const now = Math.floor(Date.now() / 1000)
+  return await sign(
+    { id: user.id, email: user.email, role: user.role, iat: now, exp: now + tokenTtlSeconds(env.JWT_EXPIRES_IN) },
+    env.JWT_SECRET,
+    'HS256',
+  )
+}
+
+/** Authentication — ตรวจ Bearer token แล้วแนบ user ลง context */
+export async function authRequired(c, next) {
+  const header = c.req.header('authorization') || ''
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null
+  if (!token) return c.json({ message: 'กรุณาเข้าสู่ระบบก่อนใช้งาน' }, 401)
+
+  let payload
   try {
-    const header = req.headers.authorization || ''
-    const token = header.startsWith('Bearer ') ? header.slice(7) : null
-    if (!token) return res.status(401).json({ message: 'กรุณาเข้าสู่ระบบก่อนใช้งาน' })
-
-    let payload
-    try {
-      payload = jwt.verify(token, JWT_SECRET)
-    } catch {
-      return res.status(401).json({ message: 'Session หมดอายุ กรุณาเข้าสู่ระบบใหม่' })
-    }
-
-    const user = await prisma.user.findUnique({ where: { id: payload.id } })
-    if (!user) return res.status(401).json({ message: 'ไม่พบผู้ใช้งานนี้ในระบบ' })
-
-    req.user = { id: user.id, name: user.name, email: user.email, role: user.role }
-    next()
-  } catch (err) {
-    next(err)
+    payload = await verify(token, c.env.JWT_SECRET, 'HS256')
+  } catch {
+    return c.json({ message: 'Session หมดอายุ กรุณาเข้าสู่ระบบใหม่' }, 401)
   }
+
+  const db = getDb(c.env)
+  const user = Number.isInteger(payload?.id)
+    ? await db.select().from(users).where(eq(users.id, payload.id)).get()
+    : null
+  if (!user) return c.json({ message: 'ไม่พบผู้ใช้งานนี้ในระบบ' }, 401)
+
+  c.set('user', { id: user.id, name: user.name, email: user.email, role: user.role })
+  await next()
 }
 
-/** Authorization — ต้องเป็น ADMIN เท่านั้น (ต้องใช้หลัง authRequired) */
-export function adminRequired(req, res, next) {
-  if (req.user?.role !== 'ADMIN') {
-    return res.status(403).json({ message: 'สำหรับผู้ดูแลระบบ (Admin) เท่านั้น' })
+/** Authorization — ต้องเป็น ADMIN เท่านั้น (ใช้หลัง authRequired) */
+export async function adminRequired(c, next) {
+  if (c.get('user')?.role !== 'ADMIN') {
+    return c.json({ message: 'สำหรับผู้ดูแลระบบ (Admin) เท่านั้น' }, 403)
   }
-  next()
+  await next()
 }
