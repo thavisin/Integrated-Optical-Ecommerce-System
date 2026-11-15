@@ -10,6 +10,9 @@
 @import "./styles/account.css";
 @import "./styles/admin.css";
 
+/* Tailwind 4 generates its own breakpoint-capped `container` utility (1280px at 80rem) that would beat base.css; ours wins */
+@utility container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); box-sizing: border-box; }
+
 /* Shared classes sit in @layer components so Tailwind utilities (mt-4, md:hidden, w-full) still override them. */
 @layer components {
 /* The shared vocabulary (apps/web/design.md lists every class and its states).
