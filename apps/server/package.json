@@ -4,25 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/index.js",
-    "start": "node src/index.js",
-    "setup": "prisma generate && prisma db push && node prisma/seed.js",
-    "db:push": "prisma db push",
-    "seed": "node prisma/seed.js"
-  },
-  "prisma": {
-    "seed": "node prisma/seed.js"
+    "dev": "wrangler dev --port 4000",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply optimart-db --local",
+    "seed": "node seed/build-seed.js && wrangler d1 execute optimart-db --local --file seed/seed.sql && node seed/upload-r2.js",
+    "setup": "npm run db:migrate && npm run seed",
+    "deploy": "wrangler deploy && wrangler d1 migrations apply optimart-db --remote",
+    "seed:remote": "node seed/build-seed.js && wrangler d1 execute optimart-db --remote --file seed/seed.sql && node seed/upload-r2.js --remote"
   },
   "dependencies": {
-    "@prisma/client": "^6.16.2",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.1"
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.18"
   },
   "devDependencies": {
-    "prisma": "^6.16.2"
+    "drizzle-kit": "^0.31.11",
+    "wrangler": "^4.162.0"
   }
 }

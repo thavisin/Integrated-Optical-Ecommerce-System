@@ -1,0 +1,2 @@
+# คัดลอกเป็น .dev.vars แล้วเปลี่ยนค่าเป็น secret ที่ปลอดภัย
+JWT_SECRET="change-me"

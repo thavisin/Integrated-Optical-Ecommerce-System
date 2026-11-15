@@ -1,0 +1,21 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "optimart-web",
+	"compatibility_date": "2026-11-01",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"services": [
+		{
+			// Self-reference service binding required by @opennextjs/cloudflare for cache revalidation
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "optimart-web"
+		}
+	]
+	// NEXT_PUBLIC_API_URL is inlined at build time by Next.js — set it in the shell/CI
+	// (e.g. NEXT_PUBLIC_API_URL=https://optimart-api.<subdomain>.workers.dev) before building.
+	// No D1/R2 bindings: this worker is stateless; data lives in optimart-api.
+}

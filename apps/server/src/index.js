@@ -1,40 +1,47 @@
-import 'dotenv/config'
-import express from 'express'
-import cors from 'cors'
-import path from 'node:path'
-import fs from 'node:fs'
-import { fileURLToPath } from 'node:url'
-
-import authRoutes from './routes/auth.js'
-import productRoutes from './routes/products.js'
-import orderRoutes from './routes/orders.js'
+import { Hono } from 'hono'
+import { cors } from 'hono/cors'
+import { notFound, onError } from './middleware/error.js'
 import adminRoutes from './routes/admin.js'
-import { notFound, errorHandler } from './middleware/error.js'
+import authRoutes from './routes/auth.js'
+import orderRoutes from './routes/orders.js'
+import productRoutes from './routes/products.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const app = express()
+const app = new Hono()
 
-app.use(cors())
-app.use(express.json({ limit: '2mb' }))
-app.use(express.urlencoded({ extended: true }))
-
-// ให้บริการไฟล์สลิป/รูปสินค้าที่อัปโหลด
-const uploadsDir = path.join(__dirname, '..', 'public', 'uploads')
-fs.mkdirSync(path.join(uploadsDir, 'slips'), { recursive: true })
-fs.mkdirSync(path.join(uploadsDir, 'products'), { recursive: true })
-app.use('/uploads', express.static(uploadsDir))
-
-app.get('/api/health', (req, res) => res.json({ ok: true, service: 'optimart-api' }))
-
-app.use('/api/auth', authRoutes)
-app.use('/api/products', productRoutes)
-app.use('/api/orders', orderRoutes)
-app.use('/api/admin', adminRoutes)
-
-app.use(notFound)
-app.use(errorHandler)
-
-const PORT = process.env.PORT || 4000
-app.listen(PORT, () => {
-  console.log(`✅ OptiMart API running on http://localhost:${PORT}`)
+// CORS — CORS_ORIGIN รองรับหลาย origin คั่นด้วย comma (ค่าเริ่มต้นคือ localhost:3000)
+app.use('*', async (c, next) => {
+  const origins = String(c.env.CORS_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+  const origin = origins.length === 0 || origins.includes('*') ? '*' : origins
+  return cors({ origin })(c, next)
 })
+
+app.get('/api/health', (c) => c.json({ ok: true, service: 'optimart-api' }))
+
+app.route('/api/auth', authRoutes)
+app.route('/api/products', productRoutes)
+app.route('/api/orders', orderRoutes)
+app.route('/api/admin', adminRoutes)
+
+// ให้บริการไฟล์สลิป/รูปสินค้าจาก R2 (key: products/<name>, slips/<name>)
+app.get('/uploads/*', async (c) => {
+  const key = c.req.path.slice('/uploads/'.length)
+  const object = await c.env.BUCKET.get(key)
+  if (!object) return c.notFound()
+
+  const headers = new Headers()
+  object.writeHttpMetadata(headers)
+  headers.set('etag', object.httpEtag)
+  headers.set('content-length', String(object.size))
+  if (key.startsWith('products/')) {
+    headers.set('cache-control', 'public, max-age=31536000, immutable')
+  }
+  return new Response(object.body, { headers })
+})
+
+app.notFound(notFound)
+app.onError(onError)
+
+export default app
