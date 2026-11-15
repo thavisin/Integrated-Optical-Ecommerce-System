@@ -47,6 +47,9 @@ export default function RootLayout({
                   <p className="breadcrumb">
                     © 2026 OptiMart สั่งซื้อแว่นตาออนไลน์ โอนเงินแล้วแนบสลิปในหน้าคำสั่งซื้อ ร้านตรวจสอบและจัดส่งภายใน 1 ถึง 2 วันทำการ
                   </p>
+                  <p className="breadcrumb" style={{ color: "var(--color-muted)" }}>
+                    ภาพตัวอย่างสินค้าจาก Pexels ใช้ได้ภายใต้ Pexels License
+                  </p>
                 </div>
               </div>
             </footer>

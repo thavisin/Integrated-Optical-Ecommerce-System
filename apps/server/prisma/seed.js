@@ -127,7 +127,7 @@ const PRODUCTS = [
     description: 'แว่นกันแดดสุดคลาสสิก กรอบ Wayfarer สีดำ เลนส์ G-15 กัน UV400 เหมาะทั้งผู้ชายผู้หญิง',
     shape: 'wayfarer',
     spec: '50 □ 22 · 150 · UV400',
-    file: 'rayban-wayfarer.svg',
+    file: 'photo-01.jpg',
   },
   {
     name: 'Oakley Holbrook Round',
@@ -138,7 +138,7 @@ const PRODUCTS = [
     description: 'แว่นกันแดดกีฬาสไตล์ Retroluxe เลนส์ Prizm เพิ่มความคมชัด กันแดด UV400 เหมาะกับกิจกรรมกลางแจ้ง',
     shape: 'sport',
     spec: '57 □ 17 · 138 · PRIZM',
-    file: 'oakley-holbrook.svg',
+    file: 'photo-02.jpg',
   },
   {
     name: 'JINS Classico JF-21A',
@@ -149,7 +149,7 @@ const PRODUCTS = [
     description: 'กรอบแว่นสายตาสไตล์ญี่ปุ่น น้ำหนักเบา ใส่สบายทั้งวัน มาพร้อมเลนส์แอสเฟอริกมาตรฐาน',
     shape: 'roundFull',
     spec: '49 □ 20 · 145 · ASPH',
-    file: 'jins-classico.svg',
+    file: 'photo-03.jpg',
   },
   {
     name: 'OWNDAYS Classic Air Frame',
@@ -160,7 +160,7 @@ const PRODUCTS = [
     description: 'กรอบแว่นไร้น้ำหนัก วัสดุ TR90 ยืดหยุ่นสูง เหมาะกับการใช้งานทั่วไปและสายตาสั้น/ยาว',
     shape: 'thinRect',
     spec: '51 □ 18 · 140 · TR90',
-    file: 'owndays-air.svg',
+    file: 'photo-04.jpg',
   },
   {
     name: 'Gentle Monster Bold Collection',
@@ -171,7 +171,7 @@ const PRODUCTS = [
     description: 'แว่นกันแดดดีไซน์โดดเด่นสไตล์เกาหลี กรอบหนา สีมาตรฐาน การันตีความปังทุกมุมถ่าย',
     shape: 'oversized',
     spec: '54 □ 21 · 148 · UV400',
-    file: 'gentle-monster.svg',
+    file: 'photo-05.jpg',
   },
   {
     name: 'Vogue VO5396S Feminine',
@@ -182,7 +182,7 @@ const PRODUCTS = [
     description: 'แว่นกันแดดสำหรับผู้หญิง กรอบโค้งมน เลนส์ไล่เฉด ออกแบบมาเน้นความน่ารักและทันสมัย',
     shape: 'catEye',
     spec: '55 □ 17 · 140 · GRAD',
-    file: 'vogue-feminine.svg',
+    file: 'photo-06.jpg',
   },
   {
     name: 'กรอบแว่นไททาเนียม Ultra Light',
@@ -193,7 +193,7 @@ const PRODUCTS = [
     description: 'กรอบแว่นไททาเนียมเกรดพรีเมียม เบาเป็นพิเศษ แข็งแรง ไม่ก่อนการแพ้ ผลิตในไทย',
     shape: 'titanRound',
     spec: '48 □ 21 · 145 · TITAN',
-    file: 'optimart-titanium.svg',
+    file: 'photo-07.jpg',
   },
   {
     name: 'กรอบแว่นเด็ก Kids Flex Safe',
@@ -204,7 +204,7 @@ const PRODUCTS = [
     description: 'กรอบแว่นสำหรับเด็ก วัสดุนิรภัยไม่แตกหัก สายคล้องกันหล่น ปรับได้ทุกขนาดหน้า',
     shape: 'kidsRound',
     spec: '44 □ 18 · 125 · FLEX',
-    file: 'optimart-kids.svg',
+    file: 'photo-08.jpg',
   },
   {
     name: 'เลนส์กรองแสงน้ำเงิน Blue-Cut 1.60',
@@ -215,7 +215,7 @@ const PRODUCTS = [
     description: 'เลนส์สายตาดัชนี 1.60 เคลือบกรองแสงน้ำเงินจากหน้าจอ ลดอาการตาแห้ง ตาล้าง เหมาะกับคนทำงานหน้าคอม',
     shape: 'lensDisc',
     spec: 'Ø 70 · 1.60 · BLUE-CUT',
-    file: 'hoya-bluecut.svg',
+    file: 'photo-09.jpg',
   },
   {
     name: 'คอนแท็คเลนส์รายเดือน 30 วัน',
@@ -226,7 +226,7 @@ const PRODUCTS = [
     description: 'คอนแท็คเลนส์ใส่ได้ 30 วัน/คู่ ค่าออกซิเจนสูง ใส่สบาย ชุดละ 2 ข้าง',
     shape: 'contactDome',
     spec: 'BC 8.6 · DIA 14.2 · 30 DAY',
-    file: 'bausch-monthly.svg',
+    file: 'photo-10.jpg',
   },
   {
     name: 'น้ำยาล้างคอนแท็คเลนส์ 360ml',
@@ -237,7 +237,7 @@ const PRODUCTS = [
     description: 'น้ำยาล้าง+ถนอมคอนแท็คเลนส์ ฆ่าเชื้อ 99.9% ใช้ได้ทุกเลนส์นุ่ม ขวด 360 มล.',
     shape: 'bottle',
     spec: '360 ML · MULTI-PURPOSE',
-    file: 'optifree-solution.svg',
+    file: 'photo-11.jpg',
   },
   {
     name: 'กล่องเก็บแว่น หนังแท้ + ผ้าเช็ด',
@@ -248,7 +248,7 @@ const PRODUCTS = [
     description: 'กล่องเก็บแว่นหนังแท้แข็งแรง กันกระแทก มาพร้อมผ้าไมโครไฟเบอร์เช็ดเลนส์',
     shape: 'case',
     spec: 'H 60 · W 140 · FOLD',
-    file: 'optimart-case.svg',
+    file: 'photo-12.jpg',
   },
 ]
 
@@ -305,7 +305,8 @@ async function main() {
   })
   console.log('👤 Users ready: admin@optimart.com / customer@example.com')
 
-  // ---- ภาพ specimen: เขียนใหม่ทุกครั้ง (idempotent) ----
+  // ---- specimen SVG: เขียนไว้เป็นไฟล์สำรองเมื่อไม่มีรูปถ่าย (idempotent) ----
+  // รูปสินค้าหลักเป็นภาพถ่ายจาก Pexels (photo-01..12.jpg) ที่ commit ไว้ใน repo
   for (const p of PRODUCTS) {
     fs.writeFileSync(path.join(productsDir, p.file), specimen(p))
   }

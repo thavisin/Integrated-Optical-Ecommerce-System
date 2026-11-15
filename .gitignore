@@ -19,6 +19,7 @@ apps/server/public/uploads/slips/*
 !apps/server/public/uploads/slips/.gitkeep
 apps/server/public/uploads/products/*
 !apps/server/public/uploads/products/.gitkeep
+!apps/server/public/uploads/products/photo-*
 
 # misc
 .DS_Store
