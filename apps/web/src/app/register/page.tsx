@@ -24,22 +24,22 @@ export default function RegisterPage() {
     try {
       await register(form.name, form.email, form.password);
       router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container max-w-md" style={{ paddingBlock: "var(--section-gap-s)" }}>
-      <div className="card p-[var(--space-xl)]">
-        <h1 style={{ fontSize: "var(--text-2xl)" }}>สมัครสมาชิก</h1>
-        <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+    <div className="container max-w-md py-16">
+      <div className="well">
+        <h1 className="text-2xl">สมัครสมาชิก</h1>
+        <p className="mt-2 text-sm text-muted">
           สมัครฟรี ใช้เวลาไม่ถึงหนึ่งนาที
         </p>
 
-        <form onSubmit={submit} className="mt-[var(--space-lg)] stack">
+        <form onSubmit={submit} className="stack mt-6">
           <div>
             <label className="label" htmlFor="reg-name">ชื่อนามสกุล</label>
             <input
@@ -101,8 +101,8 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="mt-[var(--space-md)] text-center text-sm" style={{ color: "var(--color-muted)" }}>
-          มีบัญชีแล้ว <Link href="/login" className="font-medium no-underline hover:underline" style={{ color: "var(--color-accent-deep)" }}>เข้าสู่ระบบ</Link>
+        <p className="mt-4 text-center text-sm text-muted">
+          มีบัญชีแล้ว <Link href="/login" className="font-medium text-ink no-underline hover:underline">เข้าสู่ระบบ</Link>
         </p>
       </div>
     </div>
