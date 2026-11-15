@@ -30,8 +30,20 @@
 .band--ink h2, .band--ink h3 { color: var(--color-paper); }
 .band--ink a { color: var(--color-paper); }
 .band--ink a:hover { text-decoration-color: var(--color-gold); }
-.band--ink .small, .band--ink .label { color: var(--color-gold-2); }
+.band--ink .small, .band--ink .label { color: color-mix(in oklab, var(--color-paper) 75%, transparent); }
 .band--ink :focus-visible { outline-color: var(--color-gold); }
+/* buttons on the ink band: the vermilion primary stays as it is; every other .btn inverts to paper text and border */
+.band--ink .btn:not(.btn--primary) { border-color: var(--color-paper); background: transparent; color: var(--color-paper); }
+.band--ink .btn--quiet:not(.btn--primary) { border-color: color-mix(in oklab, var(--color-paper) 45%, transparent); }
+.band--ink .btn--secondary:not(.btn--primary) { border: 0; border-bottom: var(--rule-bar) solid var(--color-paper); }
+.band--ink .btn:not(.btn--primary):hover { border-color: var(--color-paper); background: color-mix(in oklab, var(--color-paper) 12%, transparent); color: var(--color-paper); }
+.band--ink .btn--secondary:not(.btn--primary):hover { background: none; border-bottom-color: var(--color-gold); }
+.band--ink .btn:not(.btn--primary):active { background: color-mix(in oklab, var(--color-paper) 20%, transparent); }
+.band--ink .btn:focus-visible, .band--ink .icon-btn:focus-visible { outline-color: var(--color-gold); }
+.band--ink .btn:not(.btn--primary):disabled, .band--ink .btn:not(.btn--primary)[aria-disabled="true"] { opacity: 0.45; background: transparent; border-color: color-mix(in oklab, var(--color-paper) 45%, transparent); color: color-mix(in oklab, var(--color-paper) 70%, transparent); cursor: not-allowed; }
+.band--ink .btn--primary { color: var(--color-accent-ink); }
+.band--ink .icon-btn { color: var(--color-paper); }
+.band--ink .icon-btn:hover { background: color-mix(in oklab, var(--color-paper) 12%, transparent); }
 
 /* type */
 h1, h2, h3 { font-weight: var(--display-weight); line-height: 1; color: var(--color-ink); }

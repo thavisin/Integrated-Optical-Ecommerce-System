@@ -38,7 +38,7 @@ The locked system. Every Hallmark run reads this first, and every page uses it. 
 
 ## Faces
 - Display: Yeseva One 400, with Thai falling to Chonburi. Use it for h1–h3, the wordmark and `.rule-list` values. Never use it for labels, buttons or table data. Heads take one weight and one colour, never an italic word.
-- Body: Archivo 400/500 at 16–17px, line-height 1.55, with Thai falling to Anuphan.
+- Body: Archivo **400 and 500 only** (that is all `layout.tsx` loads; Anuphan 400/500 for Thai), 16–17px, line-height 1.55. Weight 600 exists only through `.small` and the other small-print uses (Archivo Narrow / Anuphan 600). Never use `font-bold`, `font-semibold`, `font-extrabold` or `font-weight: 600+` on the body face: the browser would fake the weight. Use `font-medium` (500) for emphasis.
 - Small print (`.small`, `figcaption`, `.help`, chip text, `dt`, stat labels): Archivo Narrow 600 at 12.5–13.5px, with Thai falling to Anuphan 600. Sentence case, untracked, no caps.
 - Figures in tables and stats use the body face with `tabular-nums` (`.num`).
 
@@ -64,7 +64,7 @@ Every control has eight states: rest, `:hover`, `:active`, `:focus-visible` (a 2
 | `.seg` / `.seg--tabs` | ink-bordered segmented choice / underlined tab strip | selected via `aria-selected`, `aria-pressed` or `aria-current="page"`; tabs get a vermilion underline |
 | `.stat-row` `.stat` | one ruled row of figures (`<b>` value, `<span>` label) | stacks under 40rem |
 | `.toolbar` `.search-group` | one ruled strip (2px ink top, hairline bottom) / field+button joined | `.divider-v` separates groups |
-| `.band` / `.band--ink` | paper-2 band with ink top rule / brown ink band with cream text | at most 2 per page, never vermilion |
+| `.band` / `.band--ink` | paper-2 band with ink top rule / brown ink band with cream text | at most 2 per page, never vermilion. Inside `.band--ink`: `.btn--primary` stays vermilion. Every other `.btn` (`--quiet`, `--secondary`, bare) and `.icon-btn` inverts to paper text and border, with hover at paper 12%, active at 20%, a gold focus ring and disabled at 45% opacity. `.small` and `.label` there are paper at 75%, never gold |
 | `.frame` (`.frame--card`) | square photo, 10% ink hairline, warm filter | empty shows a gold-2 slot; set `aspect-ratio` inline to override |
 | `.small` | Narrow 600 small print, muted | |
 | `.container` `.stack` `.stack-lg` `.section` `.section--tight` | layout | |
@@ -73,7 +73,14 @@ Every control has eight states: rest, `:hover`, `:active`, `:focus-visible` (a 2
 | `.modal-scrim` `.modal` | square paper-2, 2px ink border, hard shadow | |
 | `.nav` `.nav--pill` `.nav--flat` `.nav-link(--on)` `.menu` `.avatar` `.count` | floating pill (store) / flat bar with 2px ink rule (`/admin*`) | set by `Navbar` |
 | `.wordmark` `.mast` `.mast-links` | Yeseva wordmark; mast footer sets it at `--text-display` | in `layout.tsx` |
-| `.skip` | skip link | |
+| `.skip` | skip link | appears on `:focus-visible` |
+| `.grid-products` | product grid, `minmax(0,1fr)` tracks: 1 column, 2 at 40rem, 3 at 64rem, 4 at 80rem | no states of its own; the cards inside carry them |
+| `.rail` | horizontal scroll-snap row that cuts the next item at the gutter | `:focus-visible` ring (give it `tabindex="0"`) |
+| `.chart-svg` | inline SVG chart at full width; text in the body face with tabular numerals, muted | colour series with tokens (ink lines, gold grid, vermilion on the latest point only) |
+| `.chart-legend` | wrapping legend row of `span` items | static |
+| `.swatch` | 0.75rem square colour key, coloured inline with a token | static |
+| `.lead` | intro sentence under a head, `--text-lead`, ink-2, 52ch max | static |
+| `.num` | tabular numerals (`font-variant-numeric: tabular-nums`) for prices, counts and order numbers | static; inside `.tbl` it also forces the body face |
 
 Old classes that are restyled for now and get removed later (do not use them in new markup): `.btn--ink`, `.chip--mint`, `.steps`, `.plastic*`, `.pharm-label`/`.pharm-head`, `.stamp`, `.admin-grid`/`.admin-nav`, `.slip-frame`, `.breadcrumb`, `.divider`.
 
@@ -96,7 +103,7 @@ Old classes that are restyled for now and get removed later (do not use them in 
 - Character: quiet. A tab swaps and a row lights up on hover over `--dur-short`. No reveal, counter or loop. Under reduced motion everything finishes at once.
 
 ## Partials
-`styles/shop.css` (Task 2), `styles/account.css` (Task 3) and `styles/admin.css` (Task 4) are imported by `globals.css` and hold page-specific rules only.
+`styles/shop.css` (Task 2), `styles/account.css` (Task 3) and `styles/admin.css` (Task 4) are imported by `globals.css` and hold page-specific rules only. Each partial keeps the Hallmark pointer comment on line 1 and **all of its rules inside its `@layer components { }` block**. An unlayered rule there would beat both the shared classes and every Tailwind utility.
 
 ## Exports
 `tokens.css` in this project, with Tailwind theme variables in its `@theme static` block.
