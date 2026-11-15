@@ -131,7 +131,7 @@
 .shop-crumb [aria-current="page"] { color: var(--color-muted); }
 
 .shop-detail-grid { display: grid; gap: var(--space-xl); margin-top: var(--space-lg); }
-.shop-detail-frame { width: 100%; }
+.shop-detail-frame { width: 100%; aspect-ratio: 4 / 5; }
 .shop-frame-empty { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; color: var(--color-rule); }
 
 .shop-detail-body { display: grid; align-content: start; gap: var(--space-lg); }

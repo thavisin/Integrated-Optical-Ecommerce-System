@@ -27,7 +27,7 @@ export default function ProductCard({ product }: { product: Product }) {
       >
         {product.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={media(product.imageUrl)} alt={product.name} loading="lazy" />
+          <img src={media(product.imageUrl)} alt={product.name} width={800} height={1000} loading="lazy" />
         ) : (
           <span className="shop-frame-empty" aria-hidden="true">
             <span className="wordmark">OptiMart</span>
