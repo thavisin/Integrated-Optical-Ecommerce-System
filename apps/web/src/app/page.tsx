@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import type { Product } from "@/lib/types";
-import { CATEGORIES } from "@/lib/format";
+import { CATEGORIES, THB } from "@/lib/format";
+import { media } from "@/lib/api";
 import ProductCard from "@/components/ProductCard";
 import { Spinner } from "@/components/ui";
 
@@ -72,11 +73,16 @@ export default function HomePage() {
     router.push(`/products${q.trim() ? `?search=${encodeURIComponent(q.trim())}` : ""}`);
   };
 
+  const featured = products[0];
+
   return (
     <div>
-      {/* hero · Banner: หัวเรื่อง ประโยคเดียว และการกระทำ แล้วสินค้าโผล่เหนือรอยพับ */}
-      <section className="container" style={{ paddingTop: "var(--section-gap-s)", paddingBottom: "var(--space-2xl)" }}>
-        <div style={{ maxWidth: "46rem" }}>
+      {/* hero · Banner: ข้อความซ้าย + การ์ดสินค้ามาใหม่ตัวจริงขวา */}
+      <section
+        className="container grid items-center gap-[var(--space-xl)] md:grid-cols-[minmax(0,1fr)_19rem]"
+        style={{ paddingTop: "var(--space-2xl)", paddingBottom: "var(--space-lg)" }}
+      >
+        <div style={{ maxWidth: "40rem" }}>
           <h1>แว่นตาที่ชัด ราคาที่จริง</h1>
           <p className="lead" style={{ marginTop: "var(--space-md)" }}>
             เลือกกรอบ เลือกเลนส์ โอนเงินแนบสลิป แล้วติดตามคำสั่งซื้อได้ทุกขั้นตอน
@@ -99,10 +105,38 @@ export default function HomePage() {
             <Link href="/orders" className="btn btn--sm btn--quiet">ตรวจสอบคำสั่งซื้อ</Link>
           </div>
         </div>
+
+        {featured && (
+          <Link
+            href={`/products/${featured.id}`}
+            className="card card--lift hidden overflow-hidden no-underline md:flex md:flex-col"
+            aria-label={`ดูสินค้ามาใหม่ ${featured.name}`}
+          >
+            <div className="frame frame--card">
+              {featured.imageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={media(featured.imageUrl)} alt={featured.name} width={800} height={600} />
+              )}
+            </div>
+            <div className="pharm-label pharm-label--stub flex flex-1 flex-col" style={{ borderRadius: "0 0 var(--radius-card) var(--radius-card)", borderTop: 0, borderWidth: "0 1px 1px 1px" }}>
+              <p className="pharm-head">
+                <span>มาใหม่ในร้าน</span>
+                <span className="num">{featured.brand || "OptiMart"}</span>
+              </p>
+              <p className="line-clamp-2 font-medium" style={{ marginTop: "var(--space-2xs)", fontSize: "var(--text-md)", color: "var(--color-ink)" }}>
+                {featured.name}
+              </p>
+              <p className="num mt-[var(--space-2xs)]" style={{ fontSize: "var(--text-lg)", fontWeight: 500, color: "var(--color-ink)" }}>
+                {THB(featured.price)}
+              </p>
+              <span className="btn btn--sm btn--primary mt-[var(--space-sm)] w-full">ดูรายละเอียดสินค้า</span>
+            </div>
+          </Link>
+        )}
       </section>
 
       {/* หมวดหมู่เป็นถาดพลาสติก */}
-      <section className="container section--tight" aria-labelledby="home-categories">
+      <section className="container" style={{ paddingBlock: "var(--space-xl)" }} aria-labelledby="home-categories">
         <h2 id="home-categories" className="visually-hidden">เลือกตามหมวดหมู่</h2>
         <div className="grid grid-cols-2 gap-[var(--gap-columns)] md:grid-cols-4">
           {CATEGORIES.map((c, i) => (
@@ -121,7 +155,7 @@ export default function HomePage() {
       </section>
 
       {/* สินค้ามาใหม่ */}
-      <section className="container section--tight" aria-labelledby="home-new">
+      <section className="container" style={{ paddingTop: "var(--space-lg)", paddingBottom: "var(--space-2xl)" }} aria-labelledby="home-new">
         <div className="flex flex-wrap items-baseline justify-between gap-[var(--space-sm)]">
           <h2 id="home-new">สินค้ามาใหม่ในร้าน</h2>
           <Link href="/products" className="text-sm no-underline hover:underline" style={{ color: "var(--color-accent-deep)" }}>
@@ -141,7 +175,7 @@ export default function HomePage() {
 
       {/* ปิดท้ายด้วยข้อเท็จจริงของการซื้อ: โอนเงิน ตรวจสลิป จัดส่ง */}
       <section className="band" aria-labelledby="home-terms">
-        <div className="container section--tight">
+        <div className="container" style={{ paddingBlock: "var(--space-2xl)" }}>
           <h2 id="home-terms">ซื้อง่ายด้วยสามขั้นตอนจริงของร้าน</h2>
           <div className="stat-row mt-[var(--space-lg)]" style={{ gap: "var(--space-lg)" }}>
             <div className="stack" style={{ gap: "var(--space-2xs)" }}>
