@@ -29,15 +29,13 @@
 
 .shop-hero-feature { display: grid; justify-items: center; gap: var(--space-md); width: 100%; text-decoration: none; }
 
-/* the ground: cream at the top, dusk at the base, a low gold glow behind the frame */
+/* the ground: removed the cream-to-dusk gradient and gold glow at the owner's request; the frame sits straight on the paper */
 .shop-hero-stage {
   display: grid;
   place-items: center;
   width: 100%;
   padding: var(--space-lg) var(--space-lg) 0;
-  background:
-    radial-gradient(115% 45% at 50% 100%, color-mix(in oklab, var(--color-gold) 30%, transparent), transparent 72%),
-    linear-gradient(180deg, var(--color-paper-2) 0%, var(--color-paper-3) 52%, color-mix(in oklab, var(--color-ink) 80%, var(--color-paper-3)) 100%);
+  background: none;
 }
 
 .shop-hero-frame, .shop-hero-caption { width: 100%; max-width: min(36rem, 64svh); }

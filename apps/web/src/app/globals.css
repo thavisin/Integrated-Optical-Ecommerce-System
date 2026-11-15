@@ -410,3 +410,12 @@ a.frame:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2
   color: var(--color-ink);
 }
 .shop-cell--photo:hover { background: var(--color-paper-2); }
+/* ซูมรูปเบา ๆ เมื่อชี้เมาส์ (transform เท่านั้น ลื่น ไม่กระตุกเลย์เอาต์) */
+.shop-cell--photo > img { transition: transform var(--dur-long) var(--ease-out); }
+.shop-cell--photo:hover > img,
+.shop-cell--photo:focus-visible > img { transform: scale(1.07); }
+@media (prefers-reduced-motion: reduce) {
+  .shop-cell--photo > img { transition: none; }
+  .shop-cell--photo:hover > img,
+  .shop-cell--photo:focus-visible > img { transform: none; }
+}
