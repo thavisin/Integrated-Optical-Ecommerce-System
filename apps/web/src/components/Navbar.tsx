@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { MagnifyingGlass, ShoppingCart, CaretDown } from "@phosphor-icons/react";
+import { ShoppingCart, CaretDown } from "@phosphor-icons/react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 
@@ -18,7 +18,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [q, setQ] = useState("");
   const [mounted, setMounted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -35,10 +34,6 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const onSearchEnter = () => {
-    router.push(q.trim() ? `/products?search=${encodeURIComponent(q.trim())}` : "/products");
-  };
-
   const handleLogout = () => {
     logout();
     router.push("/");
@@ -50,23 +45,6 @@ export default function Navbar() {
         <Link href="/" className="wordmark" aria-label="OptiMart, กลับหน้าแรก">
           OptiMart
         </Link>
-
-        {/* ช่องค้นหานำทาง ไม่ใช่ form เพื่อไม่ให้แทรกลำดับฟอร์มของหน้าเอง */}
-        <div className="hidden min-w-0 flex-1 md:flex" role="search" style={{ maxWidth: "26rem" }}>
-          <label htmlFor="nav-search" className="visually-hidden">ค้นหาสินค้า</label>
-          <div className="search-shell">
-            <MagnifyingGlass size={16} weight="bold" aria-hidden="true" style={{ color: "var(--color-muted)", flexShrink: 0 }} />
-            <input
-              id="nav-search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") onSearchEnter(); }}
-              placeholder="ค้นหาแว่นตา แบรนด์ หรือเลนส์"
-              className="search-input"
-            />
-            <button type="button" className="btn btn--sm btn--quiet" onClick={onSearchEnter}>ค้นหา</button>
-          </div>
-        </div>
 
         <nav className="ml-auto hidden items-center gap-[var(--space-2xs)] md:flex" aria-label="เมนูหลัก">
           {NAV_LINKS.map((l) => (
@@ -81,7 +59,7 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-[var(--space-2xs)] md:ml-0">
+        <div className="ml-auto flex items-center gap-[var(--space-2xs)] md:ml-[var(--space-md)]">
           {loading || !mounted ? (
             <span className="btn btn--sm btn--quiet" aria-hidden="true" style={{ width: "5.5rem" }} />
           ) : user ? (
@@ -160,20 +138,7 @@ export default function Navbar() {
 
       {/* mobile nav */}
       <div className="container md:hidden" style={{ paddingBottom: "var(--space-sm)" }}>
-        <div className="search-shell md:hidden" role="search">
-          <label htmlFor="nav-search-m" className="visually-hidden">ค้นหาสินค้า</label>
-          <MagnifyingGlass size={16} weight="bold" aria-hidden="true" style={{ color: "var(--color-muted)", flexShrink: 0 }} />
-          <input
-            id="nav-search-m"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") onSearchEnter(); }}
-            placeholder="ค้นหาสินค้าในร้าน"
-            className="search-input"
-          />
-          <button type="button" className="btn btn--sm btn--quiet" onClick={onSearchEnter}>ค้นหา</button>
-        </div>
-        <nav className="flex items-center gap-[var(--space-xs)]" style={{ paddingTop: "var(--space-sm)" }} aria-label="เมนูหลัก">
+        <nav className="flex items-center gap-[var(--space-xs)]" aria-label="เมนูหลัก">
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}

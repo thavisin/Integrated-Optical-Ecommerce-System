@@ -1,5 +1,5 @@
 /* Hallmark · shape: app screen (Marquee Hero, draw 8d9467) · genre: modern-minimal · theme: Dose (deal 3/3, seed optical-shop-web-app-36f0·a0ebea7e·2026-11-15·r0) · redesign: full · job: buy, the range as the offer
- * nav: search-led bar · footer: colophon block · hero: Banner (/) · signature: the order as a pharmacy label (order detail, product cards) · states: rest hover active focus-visible disabled busy empty error · dose: white
+ * nav: edge-aligned bar, wordmark links member basket (the dealt search-led bar was removed by the owner) · footer: colophon block · hero: Banner (/) · signature: the order as a pharmacy label (order detail, product cards) · states: rest hover active focus-visible disabled busy empty error · dose: white
  * axes: light/grotesk-sans/chromatic-green · posture: committed, paper family + one pharmacy green · contrast: pass · copy: th · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, any shop could take a product grid; anchored it in this shop's own act, the transfer slip as a pharmacy label, figures in DM Mono */
 /* Hallmark · reworded "แว่นตาสวยชัด ราคาถูก สั่งง่ายในไม่กี่คลิก" to "แว่นตาที่ชัด ราคาที่จริง", "สินค้ามาใหม่" to "สินค้ามาใหม่ในร้าน", "สินค้าทั้งหมด" to "สินค้าทั้งหมดของร้าน" · 58 names the screen budget */
@@ -224,32 +224,7 @@ select.field { appearance: none; background-image: linear-gradient(45deg, transp
 .frame > img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.85) contrast(0.94); }
 .frame--card { border-radius: var(--radius-card) var(--radius-card) 0 0; }
 
-/* search pill: the shell carries the edge and the focus ring, the input sits clear inside it */
-.search-shell {
-  display: flex;
-  width: 100%;
-  min-width: 0;
-  align-items: center;
-  gap: var(--space-2xs);
-  min-height: 40px;
-  padding-inline: var(--space-sm);
-  border: 1px solid var(--color-muted);
-  border-radius: var(--radius-pill);
-  background: var(--color-paper);
-}
-.search-shell:focus-within { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-.search-input {
-  flex: 1;
-  min-width: 0;
-  border: 0;
-  background: transparent;
-  color: var(--color-ink);
-  font: 400 var(--text-sm)/1.4 var(--font-body);
-  outline: none;
-}
-.search-input:focus-visible { outline: none; }
-
-/* nav (search-led bar) */
+/* nav (edge-aligned bar: wordmark, links, member, basket) */
 .nav { position: sticky; top: 0; z-index: var(--z-sticky-nav); background: var(--color-paper); border-bottom: 1px solid var(--color-rule); }
 .nav-inner { display: flex; align-items: center; gap: var(--space-md); min-height: 64px; }
 .wordmark { display: inline-flex; align-items: baseline; gap: var(--space-2xs); font: 700 var(--text-lg)/1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--color-ink); text-decoration: none; white-space: nowrap; }
