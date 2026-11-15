@@ -22,12 +22,12 @@ export default function ProductCard({ product }: { product: Product }) {
     <article className="card card--lift flex flex-col overflow-hidden">
       <Link
         href={`/products/${product.id}`}
-        className="frame frame--card block"
+        className="frame frame--card frame--fit block"
         aria-label={`ดูรายละเอียด ${product.name}`}
       >
         {product.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={media(product.imageUrl)} alt={product.name} width={800} height={600} />
+          <img src={media(product.imageUrl)} alt={product.name} loading="lazy" />
         ) : (
           <span className="shop-frame-empty" aria-hidden="true">
             <span className="wordmark">OptiMart</span>

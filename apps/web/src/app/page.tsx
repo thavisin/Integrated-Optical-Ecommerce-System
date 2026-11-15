@@ -9,50 +9,12 @@ import { CATEGORIES, THB, categoryLabel } from "@/lib/format";
 import ProductCard from "@/components/ProductCard";
 import { Spinner } from "@/components/ui";
 
-/* ลายเส้นกรอบแว่นแบบแคตตาล็อก ขนาดไอคอน เส้นเดียวกันทั้งชุด */
-function FrameMark({ kind }: { kind: "frame" | "sun" | "lens" | "acc" }) {
-  const common = {
-    width: 28,
-    height: 28,
-    viewBox: "0 0 48 48",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.5,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-  if (kind === "frame")
-    return (
-      <svg {...common} aria-hidden="true">
-        <circle cx="15" cy="24" r="9" />
-        <circle cx="33" cy="24" r="9" />
-        <path d="M24 22c1.5-2 2.5-2 4 0" />
-        <path d="M6 22 3 19M42 22l3-3" />
-      </svg>
-    );
-  if (kind === "sun")
-    return (
-      <svg {...common} aria-hidden="true">
-        <path d="M10 22c0-5 4-8 8-8h12c4 0 8 3 8 8v1c0 6-6 8-14 8s-14-2-14-8z" />
-        <path d="M4 18l4 3M44 18l-4 3M24 8v5" />
-      </svg>
-    );
-  if (kind === "lens")
-    return (
-      <svg {...common} aria-hidden="true">
-        <circle cx="24" cy="24" r="14" />
-        <path d="M18 18c-2 2-3 4-3 7" />
-      </svg>
-    );
-  return (
-    <svg {...common} aria-hidden="true">
-      <rect x="8" y="16" width="32" height="18" rx="6" />
-      <path d="M8 25h32" />
-    </svg>
-  );
-}
-
-const TILE_KINDS: ("frame" | "sun" | "lens" | "acc")[] = ["frame", "sun", "lens", "acc"];
+const CATEGORY_PHOTOS = [
+  "/uploads/products/photo-03.jpg",
+  "/uploads/products/photo-01.jpg",
+  "/uploads/products/photo-10.jpg",
+  "/uploads/products/photo-12.jpg",
+];
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -132,18 +94,21 @@ export default function HomePage() {
       </section>
 
       {/* bento: หมวดหมู่สี่ช่องก่อน แล้วจึงหัวข้อสินค้ามาใหม่และเซลล์สินค้าที่ไม่เท่ากัน */}
-      <section className="container section" aria-labelledby="home-new">
+      <section
+        className="container"
+        style={{ paddingTop: "var(--space-lg)", paddingBottom: "var(--space-2xl)" }}
+        aria-labelledby="home-new"
+      >
         <h2 id="home-categories" className="visually-hidden">เลือกตามหมวดหมู่</h2>
-        <div className="shop-bento">
+        <div className="shop-bento" style={{ marginTop: 0 }}>
           {CATEGORIES.map((c, i) => (
             <Link
               key={c.value}
               href={`/products?category=${c.value}`}
-              className={`shop-cell ${i < 2 ? "shop-cell--wide" : "shop-cell--narrow"}`}
+              className={`shop-cell shop-cell--photo ${i < 2 ? "shop-cell--wide" : "shop-cell--narrow"}`}
             >
-              <span className="shop-cell-mark">
-                <FrameMark kind={TILE_KINDS[i]} />
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={media(CATEGORY_PHOTOS[i])} alt="" loading="lazy" />
               <span className="shop-cell-label">{c.label}</span>
             </Link>
           ))}
