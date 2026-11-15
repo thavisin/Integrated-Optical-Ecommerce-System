@@ -2,36 +2,88 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
 import { api } from "@/lib/api";
 import type { AdminStats } from "@/lib/types";
 import { THB, formatDateTime, orderNo, ORDER_STATUS } from "@/lib/format";
 import StatusBadge from "@/components/StatusBadge";
 import { Spinner, ErrorBanner } from "@/components/ui";
 
-const STATUS_COLORS: Record<string, string> = {
-  AWAITING_PAYMENT: "#94a3b8",
-  PENDING_VERIFY: "#f59e0b",
-  PAID: "#0ea5e9",
-  SHIPPED: "#6366f1",
-  COMPLETED: "#10b981",
-  REJECTED: "#f43f5e",
-  CANCELLED: "#cbd5e1",
+const STATUS_SWATCH: Record<string, string> = {
+  AWAITING_PAYMENT: "var(--color-rule)",
+  PENDING_VERIFY: "var(--color-muted)",
+  PAID: "var(--color-accent)",
+  SHIPPED: "var(--color-ink-2)",
+  COMPLETED: "var(--color-accent-soft)",
+  REJECTED: "var(--color-paper-3)",
+  CANCELLED: "var(--color-paper-2)",
 };
+
+const monthLabel = (m: string) => {
+  const [, mm] = m.split("-");
+  const names = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+  return names[Number(mm) - 1];
+};
+
+/** เส้นรายได้รายวัน: inline SVG, เส้น 2px เดียวสี accent, เส้นกริด hairline */
+function RevenueLine({ data }: { data: { date: string; amount: number }[] }) {
+  const W = 720;
+  const H = 220;
+  const PAD = { top: 12, right: 8, bottom: 26, left: 52 };
+  const max = Math.max(...data.map((d) => d.amount), 1);
+  const innerW = W - PAD.left - PAD.right;
+  const innerH = H - PAD.top - PAD.bottom;
+  const x = (i: number) => PAD.left + (innerW * i) / Math.max(data.length - 1, 1);
+  const y = (v: number) => PAD.top + innerH - (innerH * v) / max;
+  const line = data.map((d, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(d.amount).toFixed(1)}`).join(" ");
+  const ticks = [0, 0.5, 1].map((t) => t * max);
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg" role="img" aria-label={`กราฟรายได้ย้อนหลัง 14 วัน สูงสุดวันละ ${THB(max)}`}>
+      {ticks.map((t, i) => (
+        <g key={i}>
+          <line x1={PAD.left} x2={W - PAD.right} y1={y(t)} y2={y(t)} stroke="var(--color-rule)" strokeWidth="1" />
+          <text x={PAD.left - 8} y={y(t) + 4} textAnchor="end" fontSize="10">
+            {t >= 1000 ? `${Math.round(t / 1000)}k` : Math.round(t)}
+          </text>
+        </g>
+      ))}
+      {data.map((d, i) =>
+        i % 2 === 0 ? (
+          <text key={d.date} x={x(i)} y={H - 8} textAnchor="middle" fontSize="10">
+            {d.date.slice(5)}
+          </text>
+        ) : null
+      )}
+      <path d={line} fill="none" stroke="var(--color-accent)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** แท่งรายเดือน: แท่ง 20px ปลายมนด้านข้อมูลเท่านั้น */
+function MonthlyBars({ data }: { data: { month: string; amount: number }[] }) {
+  const max = Math.max(...data.map((d) => d.amount), 1);
+  return (
+    <ul className="mt-[var(--space-md)] space-y-[var(--space-sm)]" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+      {data.map((d) => (
+        <li key={d.month} className="grid items-center gap-[var(--space-sm)]" style={{ gridTemplateColumns: "3.5rem minmax(0,1fr) 5.5rem" }}>
+          <span className="text-sm" style={{ color: "var(--color-ink-2)" }}>{monthLabel(d.month)}</span>
+          <span
+            role="img"
+            aria-label={`${monthLabel(d.month)} รายได้ ${THB(d.amount)}`}
+            style={{
+              display: "block",
+              height: "12px",
+              borderRadius: "0 2px 2px 0",
+              background: "var(--color-accent)",
+              width: `${Math.max((d.amount / max) * 100, d.amount > 0 ? 2 : 0)}%`,
+            }}
+          />
+          <span className="num text-right text-sm" style={{ color: "var(--color-muted)" }}>{THB(d.amount)}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
@@ -45,173 +97,142 @@ export default function AdminDashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <Spinner label="กำลังโหลดข้อมูลสรุป…" />;
+  if (loading) return <Spinner label="กำลังโหลดข้อมูลสรุป" />;
   if (error || !stats)
     return (
-      <div>
-        <h1 className="text-2xl font-extrabold">📊 Sales Analytics</h1>
-        <div className="mt-4">{error && <ErrorBanner message={error} />}</div>
+      <div className="stack">
+        <h1>สรุปยอดขายของร้าน</h1>
+        {error && <ErrorBanner message={error} />}
       </div>
     );
 
   const cards = [
-    { label: "รายได้รวม", value: THB(stats.cards.revenue), sub: "นับเฉพาะที่ชำระแล้ว", icon: "💰", color: "text-emerald-600" },
-    { label: "คำสั่งซื้อทั้งหมด", value: String(stats.cards.totalOrders), sub: `รอตรวจสลิป ${stats.cards.pendingVerify} รายการ`, icon: "🧾", color: "text-sky-600" },
-    { label: "ลูกค้า", value: String(stats.cards.customers), sub: "ผู้ใช้ที่สมัครแล้ว", icon: "👥", color: "text-indigo-600" },
-    { label: "สินค้าในระบบ", value: String(stats.cards.products), sub: `สต็อกต่ำ ${stats.cards.lowStock} รายการ`, icon: "📦", color: "text-amber-600" },
+    { label: "รายได้รวม เฉพาะคำสั่งซื้อที่ชำระแล้ว", value: THB(stats.cards.revenue) },
+    { label: `คำสั่งซื้อทั้งหมด มี ${stats.cards.pendingVerify} รายการที่รอตรวจสลิป`, value: String(stats.cards.totalOrders) },
+    { label: `ลูกค้าที่สมัครแล้ว ร้านมีสินค้า ${stats.cards.products} รายการ`, value: String(stats.cards.customers) },
+    { label: "สินค้าที่สต็อกเหลือไม่เกิน 3 ชิ้น", value: String(stats.cards.lowStock) },
   ];
 
-  const pieData = stats.ordersByStatus.map((s) => ({
-    ...s,
-    label: ORDER_STATUS[s.status]?.label ?? s.status,
-  }));
-
-  const monthLabel = (m: string) => {
-    const [y, mm] = m.split("-");
-    const names = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-    return `${names[Number(mm) - 1]} ${Number(y) + 543}`;
-  };
+  const totalOrders = stats.ordersByStatus.reduce((s, o) => s + o.count, 0) || 1;
 
   return (
-    <div>
-      <h1 className="text-2xl font-extrabold text-slate-900">📊 Sales Analytics Dashboard</h1>
-      <p className="mt-1 text-sm text-slate-500">สรุปข้อมูลการสั่งซื้อและยอดขายของร้าน</p>
+    <div className="stack-lg">
+      <div>
+        <h1>สรุปยอดขายของร้าน</h1>
+        <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+          ตัวเลขนับเฉพาะคำสั่งซื้อที่ชำระเงินแล้ว
+        </p>
+      </div>
 
-      {/* stat cards */}
-      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* ตัวเลขหลัก */}
+      <div className="stat-row card p-[var(--space-lg)]">
         {cards.map((c) => (
-          <div key={c.label} className="rounded-2xl border border-slate-200 bg-white p-5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-500">{c.label}</span>
-              <span className="text-2xl">{c.icon}</span>
-            </div>
-            <div className={`mt-2 text-2xl font-extrabold ${c.color}`}>{c.value}</div>
-            <div className="mt-1 text-xs text-slate-400">{c.sub}</div>
+          <div className="stat" key={c.label}>
+            <b>{c.value}</b>
+            <span>{c.label}</span>
           </div>
         ))}
       </div>
 
-      {/* revenue charts */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-2">
-          <h2 className="font-bold text-slate-800">รายได้ย้อนหลัง 14 วัน</h2>
-          <div className="mt-3">
-            <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={stats.revenueByDay}>
-                <defs>
-                  <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} tickFormatter={(v: string) => v.slice(5)} />
-                <YAxis tick={{ fontSize: 11 }} width={70} tickFormatter={(v: number) => `${v / 1000}k`} />
-                <Tooltip
-                  formatter={(v: any) => THB(Number(v))}
-                  labelFormatter={(l: any) => `วันที่ ${String(l).slice(5)}`}
-                />
-                <Area type="monotone" dataKey="amount" name="รายได้" stroke="#6366f1" strokeWidth={2} fill="url(#revGrad)" />
-              </AreaChart>
-            </ResponsiveContainer>
+      <div className="grid gap-[var(--space-lg)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        {/* รายได้ 14 วัน */}
+        <section className="card p-[var(--space-lg)]" aria-labelledby="dash-day">
+          <h2 id="dash-day" style={{ fontSize: "var(--text-title)" }}>รายได้รายวัน ย้อนหลัง 14 วัน</h2>
+          <div className="mt-[var(--space-md)]">
+            <RevenueLine data={stats.revenueByDay} />
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="font-bold text-slate-800">สัดส่วนสถานะคำสั่งซื้อ</h2>
-          <div className="mt-3">
-            <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie data={pieData} dataKey="count" nameKey="label" innerRadius={50} outerRadius={85} paddingAngle={2}>
-                  {pieData.map((d) => (
-                    <Cell key={d.status} fill={STATUS_COLORS[d.status] || "#94a3b8"} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+        {/* แนวโน้มรายเดือน */}
+        <section className="card p-[var(--space-lg)]" aria-labelledby="dash-month">
+          <h2 id="dash-month" style={{ fontSize: "var(--text-title)" }}>แนวโน้มรายเดือน 6 เดือน</h2>
+          <MonthlyBars data={stats.revenueByMonth} />
         </section>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        {/* monthly trend */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-2">
-          <h2 className="font-bold text-slate-800">แนวโน้มรายได้รายเดือน (6 เดือน)</h2>
-          <div className="mt-3">
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={stats.revenueByMonth}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} tickFormatter={(v: string) => monthLabel(v)} />
-                <YAxis tick={{ fontSize: 11 }} width={70} tickFormatter={(v: number) => `${v / 1000}k`} />
-                <Tooltip formatter={(v: any) => THB(Number(v))} labelFormatter={(l: any) => monthLabel(String(l))} />
-                <Bar dataKey="amount" name="รายได้" fill="#0ea5e9" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+      <div className="grid gap-[var(--space-lg)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        {/* คำสั่งซื้อล่าสุด */}
+        <section className="card p-[var(--space-lg)]" aria-labelledby="dash-recent">
+          <div className="flex flex-wrap items-baseline justify-between gap-[var(--space-sm)]">
+            <h2 id="dash-recent" style={{ fontSize: "var(--text-title)" }}>คำสั่งซื้อล่าสุด</h2>
+            <Link href="/admin/orders" className="text-sm no-underline hover:underline" style={{ color: "var(--color-accent-deep)" }}>
+              จัดการคำสั่งซื้อทั้งหมด
+            </Link>
+          </div>
+          <div className="tbl-scroll mt-[var(--space-md)]">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th scope="col">คำสั่งซื้อ</th>
+                  <th scope="col">ลูกค้า</th>
+                  <th scope="col">วันที่</th>
+                  <th scope="col">ยอดรวม</th>
+                  <th scope="col">สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.recentOrders.map((o) => (
+                  <tr key={o.id}>
+                    <td className="num font-medium">{orderNo(o.id)}</td>
+                    <td>{o.customer}</td>
+                    <td className="num">{formatDateTime(o.createdAt)} น.</td>
+                    <td className="num font-medium">{THB(o.total)}</td>
+                    <td><StatusBadge status={o.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
 
-        {/* top products */}
-        <section className="rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="font-bold text-slate-800">สินค้าขายดี Top 5 🏆</h2>
-          {stats.topProducts.length === 0 ? (
-            <p className="mt-4 text-sm text-slate-400">ยังไม่มีข้อมูลการขาย</p>
-          ) : (
-            <ol className="mt-3 space-y-3">
-              {stats.topProducts.map((p, i) => (
-                <li key={p.name} className="flex items-center gap-3">
-                  <span
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                      i === 0 ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"
-                    }`}
-                  >
-                    {i + 1}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-1 text-sm font-medium">{p.name}</p>
-                    <p className="text-xs text-slate-400">ขายได้ {p.quantity} ชิ้น · {THB(p.revenue)}</p>
-                  </div>
+        {/* สัดส่วนสถานะ + สินค้าขายดี */}
+        <div className="stack-lg">
+          <section className="card p-[var(--space-lg)]" aria-labelledby="dash-status">
+            <h2 id="dash-status" style={{ fontSize: "var(--text-title)" }}>สถานะคำสั่งซื้อทั้งหมด</h2>
+            <div
+              className="mt-[var(--space-md)]"
+              role="img"
+              aria-label={stats.ordersByStatus.map((s) => `${ORDER_STATUS[s.status]?.label ?? s.status} ${s.count} รายการ`).join(", ")}
+              style={{ display: "flex", height: "14px", borderRadius: "var(--radius-pill)", overflow: "hidden", background: "var(--color-paper-2)" }}
+            >
+              {stats.ordersByStatus.map((s) => (
+                <span
+                  key={s.status}
+                  style={{ width: `${(s.count / totalOrders) * 100}%`, background: STATUS_SWATCH[s.status], flexShrink: 0 }}
+                />
+              ))}
+            </div>
+            <ul className="mt-[var(--space-md)] grid grid-cols-2 gap-[var(--space-2xs)]" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+              {stats.ordersByStatus.map((s) => (
+                <li key={s.status} className="chart-legend" style={{ display: "flex", alignItems: "center", gap: "var(--space-2xs)", fontSize: "var(--text-sm)", color: "var(--color-ink-2)" }}>
+                  <span className="swatch" style={{ background: STATUS_SWATCH[s.status] }} aria-hidden="true" />
+                  {ORDER_STATUS[s.status]?.label ?? s.status}
+                  <span className="num" style={{ color: "var(--color-muted)" }}>{s.count}</span>
                 </li>
               ))}
-            </ol>
-          )}
-        </section>
-      </div>
+            </ul>
+          </section>
 
-      {/* recent orders */}
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-bold text-slate-800">คำสั่งซื้อล่าสุด</h2>
-          <Link href="/admin/orders" className="text-sm font-medium text-indigo-600 hover:underline">
-            จัดการคำสั่งซื้อทั้งหมด →
-          </Link>
+          <section className="card p-[var(--space-lg)]" aria-labelledby="dash-top">
+            <h2 id="dash-top" style={{ fontSize: "var(--text-title)" }}>สินค้าขายดีที่สุด 5 อันดับ</h2>
+            {stats.topProducts.length === 0 ? (
+              <p className="mt-[var(--space-sm)] text-sm" style={{ color: "var(--color-muted)" }}>ยังไม่มีข้อมูลการขาย</p>
+            ) : (
+              <ol className="mt-[var(--space-md)] space-y-[var(--space-xs)]" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                {stats.topProducts.map((p, i) => (
+                  <li key={p.name} className="flex items-baseline gap-[var(--space-sm)]">
+                    <span className="num" style={{ color: "var(--color-muted)", fontSize: "var(--text-sm)" }}>{i + 1}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="line-clamp-1 block text-sm font-medium">{p.name}</span>
+                      <span className="num text-xs" style={{ color: "var(--color-muted)" }}>ขายได้ {p.quantity} ชิ้น {THB(p.revenue)}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
         </div>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[560px] text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 text-left text-xs text-slate-400">
-                <th className="pb-2 font-medium">คำสั่งซื้อ</th>
-                <th className="pb-2 font-medium">ลูกค้า</th>
-                <th className="pb-2 font-medium">วันที่</th>
-                <th className="pb-2 font-medium">ยอดรวม</th>
-                <th className="pb-2 font-medium">สถานะ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.recentOrders.map((o) => (
-                <tr key={o.id} className="border-b border-slate-50 last:border-0">
-                  <td className="py-3 font-semibold">{orderNo(o.id)}</td>
-                  <td className="py-3 text-slate-600">{o.customer}</td>
-                  <td className="py-3 text-slate-500">{formatDateTime(o.createdAt)} น.</td>
-                  <td className="py-3 font-bold text-indigo-600">{THB(o.total)}</td>
-                  <td className="py-3"><StatusBadge status={o.status} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

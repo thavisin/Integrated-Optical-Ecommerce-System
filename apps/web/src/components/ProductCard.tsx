@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/types";
-import { THB } from "@/lib/format";
+import { THB, categoryLabel } from "@/lib/format";
 import { media } from "@/lib/api";
 import { useCart } from "@/context/CartContext";
 
@@ -19,46 +19,47 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-lg">
+    <article className="card card--lift flex flex-col overflow-hidden">
       <Link
         href={`/products/${product.id}`}
-        className="block aspect-[4/3] overflow-hidden bg-slate-100"
+        className="frame frame--card block"
+        aria-label={`ดูรายละเอียด ${product.name}`}
       >
         {product.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={media(product.imageUrl)}
-            alt={product.name}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-          />
+          <img src={media(product.imageUrl)} alt={product.name} width={800} height={600} />
         ) : (
-          <span className="flex h-full items-center justify-center text-6xl">🕶️</span>
+          <span className="flex h-full w-full items-center justify-center" aria-hidden="true">
+            <span className="wordmark" style={{ color: "var(--color-rule)" }}>OptiMart</span>
+          </span>
         )}
       </Link>
-      <div className="flex flex-1 flex-col p-4">
-        <div className="text-xs font-medium uppercase tracking-wide text-slate-400">{product.brand}</div>
-        <Link
-          href={`/products/${product.id}`}
-          className="mt-1 line-clamp-1 font-semibold text-slate-800 hover:text-indigo-600"
-        >
-          {product.name}
-        </Link>
-        <div className="mt-2 text-lg font-bold text-indigo-600">{THB(product.price)}</div>
-        <div className="mt-1 text-xs">
-          {out ? (
-            <span className="font-medium text-rose-500">สินค้าหมด</span>
-          ) : (
-            <span className="text-emerald-600">คงเหลือ {product.stock} ชิ้น</span>
-          )}
-        </div>
+
+      <div className="pharm-label pharm-label--stub flex flex-1 flex-col" style={{ borderRadius: "0 0 var(--radius-card) var(--radius-card)", borderTop: 0, borderWidth: "0 1px 1px 1px" }}>
+        <p className="pharm-head">
+          <span>{categoryLabel(product.category)}</span>
+          <span className="num">{product.brand || "OptiMart"}</span>
+        </p>
+        <h3 className="mt-[var(--space-2xs)]" style={{ fontFamily: "var(--font-body)", fontWeight: 500, letterSpacing: 0, lineHeight: 1.35, fontSize: "var(--text-md)", maxWidth: "100%" }}>
+          <Link href={`/products/${product.id}`} className="line-clamp-2 no-underline hover:underline">
+            {product.name}
+          </Link>
+        </h3>
+        <p className="num mt-[var(--space-2xs)]" style={{ fontSize: "var(--text-lg)", fontWeight: 500, color: "var(--color-ink)" }}>
+          {THB(product.price)}
+        </p>
+        <p style={{ marginTop: "var(--space-2xs)", color: out ? "var(--color-muted)" : "var(--color-accent-deep)", fontSize: "var(--text-xs)" }}>
+          {out ? "สินค้าหมดชั่วคราว" : `คงเหลือ ${product.stock} ชิ้น`}
+        </p>
         <button
+          type="button"
           onClick={handleAdd}
           disabled={out}
-          className="mt-3 w-full rounded-xl bg-slate-900 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className={`btn btn--sm mt-[var(--space-sm)] w-full ${added ? "btn--quiet" : "btn--primary"}`}
         >
-          {added ? "เพิ่มแล้ว ✓" : out ? "สินค้าหมด" : "หยิบลงตะกร้า 🛒"}
+          {added ? "เพิ่มแล้วในตะกร้า" : "หยิบลงตะกร้า"}
         </button>
       </div>
-    </div>
+    </article>
   );
 }

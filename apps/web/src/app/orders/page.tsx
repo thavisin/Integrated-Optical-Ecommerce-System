@@ -27,70 +27,74 @@ export default function OrdersPage() {
       .finally(() => setLoading(false));
   }, [user, authLoading]);
 
-  if (authLoading || (loading && user)) return <Spinner label="กำลังโหลดประวัติการสั่งซื้อ…" />;
+  if (authLoading || (loading && user)) return <Spinner label="กำลังโหลดประวัติการสั่งซื้อ" />;
 
   if (!user)
     return (
-      <div className="mx-auto max-w-3xl px-4 py-12">
-        <EmptyState icon="🔐" title="กรุณาเข้าสู่ระบบเพื่อดูประวัติการสั่งซื้อ">
-          <Link href="/login" className="mt-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-medium text-white">
-            เข้าสู่ระบบ
-          </Link>
+      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+        <EmptyState icon="auth" title="เข้าสู่ระบบก่อนจึงจะเห็นประวัติการสั่งซื้อของคุณ">
+          <Link href="/login" className="btn btn--sm mt-[var(--space-2xs)] btn--primary">เข้าสู่ระบบ</Link>
         </EmptyState>
       </div>
     );
 
-  if (error) return <div className="mx-auto max-w-3xl px-4 py-12"><EmptyState icon="⚠️" title={error} /></div>;
+  if (error)
+    return (
+      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+        <EmptyState icon="warn" title={error} />
+      </div>
+    );
 
   if (orders.length === 0)
     return (
-      <div className="mx-auto max-w-3xl px-4 py-12">
-        <EmptyState icon="🧾" title="ยังไม่มีประวัติการสั่งซื้อ">
-          <Link href="/products" className="mt-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-medium text-white">
-            เริ่มช้อปปิ้งกันเลย →
-          </Link>
+      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+        <EmptyState icon="orders" title="ยังไม่มีประวัติการสั่งซื้อ">
+          <Link href="/products" className="btn btn--sm mt-[var(--space-2xs)] btn--primary">เริ่มเลือกแว่นตา</Link>
         </EmptyState>
       </div>
     );
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-extrabold text-slate-900">คำสั่งซื้อของฉัน 🧾</h1>
-      <p className="mt-1 text-sm text-slate-500">ติดตามสถานะและดูรายละเอียดคำสั่งซื้อทั้งหมด</p>
+    <div className="container max-w-4xl" style={{ paddingBlock: "var(--space-lg) var(--section-gap-s)" }}>
+      <h1>คำสั่งซื้อของฉัน</h1>
+      <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+        ทุกคำสั่งซื้อพร้อมสถานะการตรวจสลิปและการจัดส่ง
+      </p>
 
-      <div className="mt-6 space-y-4">
+      <ul className="card mt-[var(--space-xl)] divide-y" style={{ borderColor: "var(--color-rule)", listStyle: "none", margin: 0, padding: 0 }}>
         {orders.map((order) => {
           const firstItem = order.items[0];
           const extraCount = order.items.length - 1;
           return (
-            <Link
-              key={order.id}
-              href={`/orders/${order.id}`}
-              className="block rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-indigo-300 hover:shadow-md"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <div className="font-bold text-slate-900">{orderNo(order.id)}</div>
-                  <div className="text-xs text-slate-400">{formatDateTime(order.createdAt)} น.</div>
+            <li key={order.id} className="border-b last:border-b-0" style={{ borderColor: "var(--color-rule)" }}>
+              <Link
+                href={`/orders/${order.id}`}
+                className="block p-[var(--space-lg)] no-underline transition-colors duration-[var(--dur-short)] hover:bg-[var(--color-paper-2)]"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-[var(--space-sm)]">
+                  <div>
+                    <p className="num font-medium" style={{ color: "var(--color-ink)" }}>{orderNo(order.id)}</p>
+                    <p className="num text-xs" style={{ color: "var(--color-muted)" }}>{formatDateTime(order.createdAt)} น.</p>
+                  </div>
+                  <StatusBadge status={order.status} />
                 </div>
-                <StatusBadge status={order.status} />
-              </div>
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
-                <span className="text-slate-600">
-                  {firstItem?.product?.name ?? firstItem?.productId}
-                  {extraCount > 0 && <span className="text-slate-400"> และอีก {extraCount} รายการ</span>}
-                </span>
-                <span className="text-lg font-extrabold text-indigo-600">{THB(order.total)}</span>
-              </div>
-              {order.status === "REJECTED" && order.note && (
-                <p className="mt-2 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700">
-                  ❌ สลิปถูกปฏิเสธ: {order.note}
-                </p>
-              )}
-            </Link>
+                <div className="mt-[var(--space-sm)] flex flex-wrap items-center justify-between gap-[var(--space-sm)] text-sm">
+                  <span style={{ color: "var(--color-ink-2)" }}>
+                    {firstItem?.product?.name ?? `สินค้าหมายเลข ${firstItem?.productId}`}
+                    {extraCount > 0 && <span style={{ color: "var(--color-muted)" }}> และอีก {extraCount} รายการ</span>}
+                  </span>
+                  <span className="num font-bold" style={{ color: "var(--color-accent-deep)" }}>{THB(order.total)}</span>
+                </div>
+                {order.status === "REJECTED" && order.note && (
+                  <p className="mt-[var(--space-xs)] text-xs" style={{ color: "var(--color-muted)" }}>
+                    สลิปไม่ผ่านการตรวจ: {order.note} ส่งสลิปใหม่ได้ในหน้ารายละเอียด
+                  </p>
+                )}
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }

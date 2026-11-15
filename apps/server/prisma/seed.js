@@ -13,50 +13,105 @@ const slipsDir = path.join(__dirname, '..', 'public', 'uploads', 'slips')
 fs.mkdirSync(productsDir, { recursive: true })
 fs.mkdirSync(slipsDir, { recursive: true })
 
-/* ---------- รูปภาพตัวอย่าง (SVG placeholder) ---------- */
+/* ---------- ภาพสินค้า: การ์ดสเปคสินค้าแบบแคตตาล็อกร้านแว่น (specimen card) ----------
+   ลายเส้นหน้ากรอบหนึ่งเส้นเดียวทั้งร้าน + สเปคตัวเลขแบบ mono ใต้ภาพ
+   สีอ้างอิงจากธีม Dose: กระดาษอุ่น หมึกเขียวดำ เขียวร้านหนึ่งเส้น */
 
-function glassesSvg(brand, c1, c2) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+const C = {
+  paper: '#F7F3E9',
+  ink: '#2B3634',
+  rule: '#D9DCD2',
+  muted: '#77827C',
+  accent: '#1E7A5A',
+}
+
+function specimen({ category, brand, spec, shape }) {
+  const W = 800, H = 600
+  const label = category === 'SUNGLASS' ? 'SUN' : category === 'LENS' ? 'LENS' : category === 'ACCESSORY' ? 'ACC' : 'OPT'
+  const g = (inner) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="${c1}"/>
-      <stop offset="1" stop-color="${c2}"/>
-    </linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/><feColorMatrix values="0 0 0 0 0.3 0 0 0 0 0.34 0 0 0 0 0.32 0 0 0 0.05 0"/></filter>
   </defs>
-  <rect width="800" height="600" fill="url(#g)"/>
-  <g stroke="#ffffff" stroke-width="14" fill="rgba(255,255,255,0.12)" stroke-linecap="round">
-    <circle cx="275" cy="290" r="95"/>
-    <circle cx="525" cy="290" r="95"/>
-    <path d="M370 290 Q400 250 430 290"/>
-    <path d="M182 275 L120 245"/>
-    <path d="M618 275 L680 245"/>
+  <rect width="${W}" height="${H}" fill="${C.paper}"/>
+  <rect width="${W}" height="${H}" filter="url(#grain)" opacity="0.5"/>
+  <rect x="24" y="24" width="${W - 48}" height="${H - 48}" fill="none" stroke="${C.rule}" stroke-width="1.5"/>
+  <text x="48" y="72" font-family="'IBM Plex Mono', 'SF Mono', Menlo, monospace" font-size="22" fill="${C.ink}">${brand}</text>
+  <text x="${W - 48}" y="72" text-anchor="end" font-family="'IBM Plex Mono', 'SF Mono', Menlo, monospace" font-size="16" fill="${C.muted}">${label}</text>
+  <g stroke="${C.ink}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+${inner}
   </g>
-  <text x="400" y="480" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="38" font-weight="700" fill="#ffffff">${brand}</text>
+  <text x="48" y="${H - 52}" font-family="'IBM Plex Mono', 'SF Mono', Menlo, monospace" font-size="22" fill="${C.ink}">${spec}</text>
+  <text x="${W - 48}" y="${H - 52}" text-anchor="end" font-family="'IBM Plex Mono', 'SF Mono', Menlo, monospace" font-size="16" fill="${C.accent}">OptiMart</text>
 </svg>`
+
+  /* หน้ากรอบแว่นแต่ละแบบ วาดบนกริดกลางภาพ (กลางที่ 300) */
+  const shapes = {
+    wayfarer: `<path d="M170 260 L330 240 Q360 236 396 240 Q432 236 462 240 L630 260 Q648 262 646 282 L636 356 Q632 386 600 390 L470 396 Q440 398 428 370 L414 330 Q400 308 386 330 L372 370 Q360 398 330 396 L200 390 Q168 386 164 356 L154 282 Q152 262 170 260 Z"/>
+      <path d="M164 268 Q400 224 636 268" stroke-width="9"/>`,
+    sport: `<rect x="168" y="252" width="212" height="128" rx="26"/>
+      <rect x="420" y="252" width="212" height="128" rx="26"/>
+      <path d="M380 268 Q400 252 420 268"/>
+      <path d="M168 264 L128 244 M632 264 L672 244"/>`,
+    roundFull: `<circle cx="272" cy="308" r="88"/>
+      <circle cx="528" cy="308" r="88"/>
+      <path d="M360 296 Q400 262 440 296"/>
+      <path d="M186 296 L128 268 M614 296 L672 268"/>`,
+    thinRect: `<rect x="184" y="262" width="188" height="100" rx="18"/>
+      <rect x="428" y="262" width="188" height="100" rx="18"/>
+      <path d="M372 282 Q400 268 428 282"/>
+      <path d="M184 276 L132 256 M616 276 L668 256"/>`,
+    oversized: `<path d="M164 250 Q400 210 636 250 L648 340 Q650 384 600 392 L476 400 Q436 402 420 366 L410 336 Q400 314 390 336 L380 366 Q364 402 324 400 L200 392 Q150 384 152 340 Z"/>`,
+    catEye: `<path d="M172 272 Q290 232 376 268 Q400 280 424 268 Q510 232 628 272 L640 330 Q644 378 590 388 L480 396 Q442 398 424 362 L412 332 Q400 310 388 332 L376 362 Q358 398 320 396 L210 388 Q156 378 160 330 Z"/>
+      <path d="M172 272 L146 240 M628 272 L654 240"/>`,
+    titanRound: `<circle cx="272" cy="306" r="84"/>
+      <circle cx="528" cy="306" r="84"/>
+      <path d="M356 290 Q400 264 444 290"/>
+      <path d="M356 310 Q400 336 444 310"/>
+      <path d="M190 294 L134 272 M610 294 L666 272"/>`,
+    kidsRound: `<circle cx="288" cy="310" r="72"/>
+      <circle cx="512" cy="310" r="72"/>
+      <path d="M360 296 Q400 272 440 296"/>
+      <path d="M216 300 L166 284 M584 300 L634 284"/>`,
+    lensDisc: `<circle cx="400" cy="304" r="118"/>
+      <path d="M330 258 Q312 280 306 308"/>
+      <path d="M474 344 Q492 322 496 296" stroke="${C.accent}"/>`,
+    contactDome: `<path d="M240 352 Q400 216 560 352"/>
+      <path d="M212 352 L588 352"/>
+      <path d="M330 292 Q400 252 470 292" stroke="${C.accent}"/>`,
+    bottle: `<rect x="336" y="238" width="128" height="160" rx="20"/>
+      <rect x="372" y="204" width="56" height="34" rx="8"/>
+      <path d="M336 296 L464 296" stroke="${C.accent}"/>`,
+    case: `<rect x="228" y="266" width="344" height="118" rx="26"/>
+      <path d="M400 266 L400 384"/>
+      <path d="M252 250 Q400 224 548 250"/>`,
+  }
+
+  return g(shapes[shape] || shapes.roundFull)
 }
 
 function slipSvg() {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="520" height="720" viewBox="0 0 520 720">
-  <rect width="520" height="720" fill="#f8fafc"/>
-  <rect width="520" height="110" fill="#0f766e"/>
-  <text x="260" y="50" text-anchor="middle" font-family="Helvetica" font-size="24" font-weight="700" fill="#ffffff">ใบโอนเงิน / PAYMENT SLIP</text>
-  <text x="260" y="82" text-anchor="middle" font-family="Helvetica" font-size="16" fill="#ccfbf1">Mobile Banking — โอนเข้าบัญชีร้าน OptiMart</text>
-  <rect x="40" y="150" width="440" height="500" rx="16" fill="#ffffff" stroke="#e2e8f0"/>
-  <circle cx="260" cy="230" r="44" fill="#0f766e"/>
-  <text x="260" y="240" text-anchor="middle" font-family="Helvetica" font-size="26" fill="#ffffff">K</text>
-  <text x="260" y="310" text-anchor="middle" font-family="Helvetica" font-size="16" fill="#64748b">โอนสำเร็จ</text>
-  <text x="260" y="365" text-anchor="middle" font-family="Helvetica" font-size="38" font-weight="700" fill="#0f172a">฿ 5,490.00</text>
-  <line x1="80" y1="400" x2="440" y2="400" stroke="#e2e8f0"/>
-  <text x="90" y="440" font-family="Helvetica" font-size="15" fill="#94a3b8">จากบัญชี</text>
-  <text x="430" y="440" text-anchor="end" font-family="Helvetica" font-size="15" fill="#0f172a">xxx-x-x1234-6</text>
-  <text x="90" y="480" font-family="Helvetica" font-size="15" fill="#94a3b8">เข้าบัญชี</text>
-  <text x="430" y="480" text-anchor="end" font-family="Helvetica" font-size="15" fill="#0f172a">OptiMart Co., Ltd. (KBANK)</text>
-  <text x="90" y="520" font-family="Helvetica" font-size="15" fill="#94a3b8">วันที่</text>
-  <text x="430" y="520" text-anchor="end" font-family="Helvetica" font-size="15" fill="#0f172a">15-11-2026 10:24 น.</text>
-  <text x="90" y="560" font-family="Helvetica" font-size="15" fill="#94a3b8">เลขอ้างอิง</text>
-  <text x="430" y="560" text-anchor="end" font-family="Helvetica" font-size="15" fill="#0f172a">TXN20261115-004218</text>
-  <rect x="150" y="600" width="220" height="28" rx="6" fill="#e2e8f0"/>
-  <text x="260" y="619" text-anchor="middle" font-family="Helvetica" font-size="13" fill="#64748b">DEMO SLIP (ข้อมูลสมมติ)</text>
+  <rect width="520" height="720" fill="#F7F3E9"/>
+  <rect width="520" height="110" fill="#1E5E4A"/>
+  <text x="260" y="50" text-anchor="middle" font-family="'IBM Plex Mono', Menlo, monospace" font-size="24" font-weight="700" fill="#F7F3E9">ใบโอนเงิน / PAYMENT SLIP</text>
+  <text x="260" y="82" text-anchor="middle" font-family="'IBM Plex Mono', Menlo, monospace" font-size="15" fill="#BFE3D5">Mobile Banking โอนเข้าบัญชีร้าน OptiMart</text>
+  <rect x="40" y="150" width="440" height="500" rx="14" fill="#FFFFFF" stroke="#D9DCD2"/>
+  <circle cx="260" cy="230" r="42" fill="#1E5E4A"/>
+  <text x="260" y="240" text-anchor="middle" font-family="'IBM Plex Mono', Menlo, monospace" font-size="24" fill="#F7F3E9">K</text>
+  <text x="260" y="310" text-anchor="middle" font-family="'IBM Plex Mono', Menlo, monospace" font-size="15" fill="#77827C">โอนสำเร็จ</text>
+  <text x="260" y="364" text-anchor="middle" font-family="'IBM Plex Mono', Menlo, monospace" font-size="36" font-weight="700" fill="#2B3634">5,490.00 THB</text>
+  <line x1="80" y1="400" x2="440" y2="400" stroke="#D9DCD2"/>
+  <text x="90" y="440" font-family="'IBM Plex Mono', Menlo, monospace" font-size="14" fill="#77827C">จากบัญชี</text>
+  <text x="430" y="440" text-anchor="end" font-family="'IBM Plex Mono', Menlo, monospace" font-size="14" fill="#2B3634">xxx-x-x1234-6</text>
+  <text x="90" y="480" font-family="'IBM Plex Mono', Menlo, monospace" font-size="14" fill="#77827C">เข้าบัญชี</text>
+  <text x="430" y="480" text-anchor="end" font-family="'IBM Plex Mono', Menlo, monospace" font-size="14" fill="#2B3634">OptiMart Co., Ltd. (KBANK)</text>
+  <text x="90" y="520" font-family="'IBM Plex Mono', Menlo, monospace" font-size="14" fill="#77827C">วันที่</text>
+  <text x="430" y="520" text-anchor="end" font-family="'IBM Plex Mono', Menlo, monospace" font-size="14" fill="#2B3634">15-11-2026 10:24</text>
+  <text x="90" y="560" font-family="'IBM Plex Mono', Menlo, monospace" font-size="14" fill="#77827C">เลขอ้างอิง</text>
+  <text x="430" y="560" text-anchor="end" font-family="'IBM Plex Mono', Menlo, monospace" font-size="14" fill="#2B3634">TXN20261115-004218</text>
+  <rect x="150" y="600" width="220" height="28" rx="6" fill="#E9ECE4"/>
+  <text x="260" y="619" text-anchor="middle" font-family="'IBM Plex Mono', Menlo, monospace" font-size="13" fill="#77827C">DEMO SLIP ข้อมูลสมมติ</text>
 </svg>`
 }
 
@@ -70,8 +125,9 @@ const PRODUCTS = [
     price: 5490,
     stock: 14,
     description: 'แว่นกันแดดสุดคลาสสิก กรอบ Wayfarer สีดำ เลนส์ G-15 กัน UV400 เหมาะทั้งผู้ชายผู้หญิง',
+    shape: 'wayfarer',
+    spec: '50 □ 22 · 150 · UV400',
     file: 'rayban-wayfarer.svg',
-    colors: ['#111827', '#374151'],
   },
   {
     name: 'Oakley Holbrook Round',
@@ -80,8 +136,9 @@ const PRODUCTS = [
     price: 6900,
     stock: 9,
     description: 'แว่นกันแดดกีฬาสไตล์ Retroluxe เลนส์ Prizm เพิ่มความคมชัด กันแดด UV400 เหมาะกับกิจกรรมกลางแจ้ง',
+    shape: 'sport',
+    spec: '57 □ 17 · 138 · PRIZM',
     file: 'oakley-holbrook.svg',
-    colors: ['#0c4a6e', '#0284c7'],
   },
   {
     name: 'JINS Classico JF-21A',
@@ -90,8 +147,9 @@ const PRODUCTS = [
     price: 1590,
     stock: 25,
     description: 'กรอบแว่นสายตาสไตล์ญี่ปุ่น น้ำหนักเบา ใส่สบายทั้งวัน มาพร้อมเลนส์แอสเฟอริกมาตรฐาน',
+    shape: 'roundFull',
+    spec: '49 □ 20 · 145 · ASPH',
     file: 'jins-classico.svg',
-    colors: ['#4c1d95', '#7c3aed'],
   },
   {
     name: 'OWNDAYS Classic Air Frame',
@@ -100,8 +158,9 @@ const PRODUCTS = [
     price: 1290,
     stock: 30,
     description: 'กรอบแว่นไร้น้ำหนัก วัสดุ TR90 ยืดหยุ่นสูง เหมาะกับการใช้งานทั่วไปและสายตาสั้น/ยาว',
+    shape: 'thinRect',
+    spec: '51 □ 18 · 140 · TR90',
     file: 'owndays-air.svg',
-    colors: ['#065f46', '#10b981'],
   },
   {
     name: 'Gentle Monster Bold Collection',
@@ -110,8 +169,9 @@ const PRODUCTS = [
     price: 9900,
     stock: 5,
     description: 'แว่นกันแดดดีไซน์โดดเด่นสไตล์เกาหลี กรอบหนา สีมาตรฐาน การันตีความปังทุกมุมถ่าย',
+    shape: 'oversized',
+    spec: '54 □ 21 · 148 · UV400',
     file: 'gentle-monster.svg',
-    colors: ['#18181b', '#71717a'],
   },
   {
     name: 'Vogue VO5396S Feminine',
@@ -120,8 +180,9 @@ const PRODUCTS = [
     price: 3290,
     stock: 11,
     description: 'แว่นกันแดดสำหรับผู้หญิง กรอบโค้งมน เลนส์ไล่เฉด ออกแบบมาเน้นความน่ารักและทันสมัย',
+    shape: 'catEye',
+    spec: '55 □ 17 · 140 · GRAD',
     file: 'vogue-feminine.svg',
-    colors: ['#9d174d', '#ec4899'],
   },
   {
     name: 'กรอบแว่นไททาเนียม Ultra Light',
@@ -130,8 +191,9 @@ const PRODUCTS = [
     price: 2990,
     stock: 18,
     description: 'กรอบแว่นไททาเนียมเกรดพรีเมียม เบาเป็นพิเศษ แข็งแรง ไม่ก่อนการแพ้ ผลิตในไทย',
+    shape: 'titanRound',
+    spec: '48 □ 21 · 145 · TITAN',
     file: 'optimart-titanium.svg',
-    colors: ['#78350f', '#d97706'],
   },
   {
     name: 'กรอบแว่นเด็ก Kids Flex Safe',
@@ -140,8 +202,9 @@ const PRODUCTS = [
     price: 890,
     stock: 22,
     description: 'กรอบแว่นสำหรับเด็ก วัสดุนิรภัยไม่แตกหัก สายคล้องกันหล่น ปรับได้ทุกขนาดหน้า',
+    shape: 'kidsRound',
+    spec: '44 □ 18 · 125 · FLEX',
     file: 'optimart-kids.svg',
-    colors: ['#1d4ed8', '#60a5fa'],
   },
   {
     name: 'เลนส์กรองแสงน้ำเงิน Blue-Cut 1.60',
@@ -150,8 +213,9 @@ const PRODUCTS = [
     price: 2490,
     stock: 40,
     description: 'เลนส์สายตาดัชนี 1.60 เคลือบกรองแสงน้ำเงินจากหน้าจอ ลดอาการตาแห้ง ตาล้าง เหมาะกับคนทำงานหน้าคอม',
+    shape: 'lensDisc',
+    spec: 'Ø 70 · 1.60 · BLUE-CUT',
     file: 'hoya-bluecut.svg',
-    colors: ['#0891b2', '#22d3ee'],
   },
   {
     name: 'คอนแท็คเลนส์รายเดือน 30 วัน',
@@ -159,9 +223,10 @@ const PRODUCTS = [
     category: 'LENS',
     price: 450,
     stock: 3,
-    description: 'คอนแท็คเลนส์ใสได้ 30 วัน/คู่ ค่าออกซิเจนสูง ใส่สบาย ชุดละ 2 ข้าง',
+    description: 'คอนแท็คเลนส์ใส่ได้ 30 วัน/คู่ ค่าออกซิเจนสูง ใส่สบาย ชุดละ 2 ข้าง',
+    shape: 'contactDome',
+    spec: 'BC 8.6 · DIA 14.2 · 30 DAY',
     file: 'bausch-monthly.svg',
-    colors: ['#155e75', '#67e8f9'],
   },
   {
     name: 'น้ำยาล้างคอนแท็คเลนส์ 360ml',
@@ -170,8 +235,9 @@ const PRODUCTS = [
     price: 220,
     stock: 50,
     description: 'น้ำยาล้าง+ถนอมคอนแท็คเลนส์ ฆ่าเชื้อ 99.9% ใช้ได้ทุกเลนส์นุ่ม ขวด 360 มล.',
+    shape: 'bottle',
+    spec: '360 ML · MULTI-PURPOSE',
     file: 'optifree-solution.svg',
-    colors: ['#312e81', '#818cf8'],
   },
   {
     name: 'กล่องเก็บแว่น หนังแท้ + ผ้าเช็ด',
@@ -180,8 +246,9 @@ const PRODUCTS = [
     price: 350,
     stock: 35,
     description: 'กล่องเก็บแว่นหนังแท้แข็งแรง กันกระแทก มาพร้อมผ้าไมโครไฟเบอร์เช็ดเลนส์',
+    shape: 'case',
+    spec: 'H 60 · W 140 · FOLD',
     file: 'optimart-case.svg',
-    colors: ['#374151', '#9ca3af'],
   },
 ]
 
@@ -238,16 +305,18 @@ async function main() {
   })
   console.log('👤 Users ready: admin@optimart.com / customer@example.com')
 
-  // ---- demo slip ----
+  // ---- ภาพ specimen: เขียนใหม่ทุกครั้ง (idempotent) ----
+  for (const p of PRODUCTS) {
+    fs.writeFileSync(path.join(productsDir, p.file), specimen(p))
+  }
   const slipFile = path.join(slipsDir, 'demo-slip.svg')
-  if (!fs.existsSync(slipFile)) fs.writeFileSync(slipFile, slipSvg())
+  fs.writeFileSync(slipFile, slipSvg())
+  console.log(`🖼️  Wrote ${PRODUCTS.length} specimen cards + demo slip`)
 
   // ---- products ----
   const existingCount = await prisma.product.count()
   if (existingCount === 0) {
     for (const p of PRODUCTS) {
-      const svgFile = path.join(productsDir, p.file)
-      if (!fs.existsSync(svgFile)) fs.writeFileSync(svgFile, glassesSvg(p.brand, p.colors[0], p.colors[1]))
       await prisma.product.create({
         data: {
           name: p.name,

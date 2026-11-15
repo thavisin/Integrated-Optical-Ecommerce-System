@@ -9,6 +9,51 @@ import { CATEGORIES } from "@/lib/format";
 import ProductCard from "@/components/ProductCard";
 import { Spinner } from "@/components/ui";
 
+/* ลายเส้นกรอบแว่นแบบแคตตาล็อก ขนาดไอคอน เส้นเดียวกันทั้งชุด */
+function FrameMark({ kind }: { kind: "frame" | "sun" | "lens" | "acc" }) {
+  const common = {
+    width: 28,
+    height: 28,
+    viewBox: "0 0 48 48",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2.5,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+  if (kind === "frame")
+    return (
+      <svg {...common} aria-hidden="true">
+        <circle cx="15" cy="24" r="9" />
+        <circle cx="33" cy="24" r="9" />
+        <path d="M24 22c1.5-2 2.5-2 4 0" />
+        <path d="M6 22 3 19M42 22l3-3" />
+      </svg>
+    );
+  if (kind === "sun")
+    return (
+      <svg {...common} aria-hidden="true">
+        <path d="M10 22c0-5 4-8 8-8h12c4 0 8 3 8 8v1c0 6-6 8-14 8s-14-2-14-8z" />
+        <path d="M4 18l4 3M44 18l-4 3M24 8v5" />
+      </svg>
+    );
+  if (kind === "lens")
+    return (
+      <svg {...common} aria-hidden="true">
+        <circle cx="24" cy="24" r="14" />
+        <path d="M18 18c-2 2-3 4-3 7" />
+      </svg>
+    );
+  return (
+    <svg {...common} aria-hidden="true">
+      <rect x="8" y="16" width="32" height="18" rx="6" />
+      <path d="M8 25h32" />
+    </svg>
+  );
+}
+
+const TILE_KINDS: ("frame" | "sun" | "lens" | "acc")[] = ["frame", "sun", "lens", "acc"];
+
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -29,77 +74,96 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-indigo-700 via-indigo-600 to-sky-500 text-white">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-16 text-center sm:px-6 md:py-24">
-          <span className="rounded-full bg-white/15 px-4 py-1.5 text-sm font-medium">
-            🚚 ส่งฟรีทั่วไทย เมื่อสั่งซื้อครบ 1,500 บาท
-          </span>
-          <h1 className="max-w-3xl text-4xl font-extrabold leading-tight sm:text-5xl">
-            แว่นตาสวยชัด ราคาถูก
-            <br />
-            สั่งง่ายในไม่กี่คลิก
-          </h1>
-          <p className="max-w-xl text-indigo-100">
-            เลือกกรอบแว่น แว่นกันแดด เลนส์กรองแสงน้ำเงิน และอุปกรณ์เสริม — โอนเงินแนบสลิปได้ทันที
-            ติดตามสถานะคำสั่งซื้อได้ตลอด 24 ชม.
+      {/* hero · Banner: หัวเรื่อง ประโยคเดียว และการกระทำ แล้วสินค้าโผล่เหนือรอยพับ */}
+      <section className="container" style={{ paddingTop: "var(--section-gap-s)", paddingBottom: "var(--space-2xl)" }}>
+        <div style={{ maxWidth: "46rem" }}>
+          <h1>แว่นตาที่ชัด ราคาที่จริง</h1>
+          <p className="lead" style={{ marginTop: "var(--space-md)" }}>
+            เลือกกรอบ เลือกเลนส์ โอนเงินแนบสลิป แล้วติดตามคำสั่งซื้อได้ทุกขั้นตอน
           </p>
-          <form onSubmit={onSearch} className="flex w-full max-w-xl gap-2">
+          <form onSubmit={onSearch} role="search" className="mt-[var(--space-lg)] flex max-w-[32rem] items-center gap-[var(--space-xs)]">
+            <label htmlFor="home-search" className="visually-hidden">ค้นหาสินค้า</label>
             <input
+              id="home-search"
+              
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="ค้นหาแว่นตา เช่น Ray-Ban, กรอบไททาเนียม…"
-              className="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-slate-800 shadow-lg outline-none placeholder:text-slate-400"
+              placeholder="ลองพิมพ์ Ray-Ban หรือ ไททาเนียม"
+              className="field"
+              style={{ flex: 1, minWidth: 0 }}
             />
-            <button className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold shadow-lg transition hover:bg-slate-700">
-              ค้นหา
-            </button>
+            <button className="btn btn--primary">ค้นหาสินค้า</button>
           </form>
-          <div className="flex gap-3 text-sm">
-            <Link href="/products" className="rounded-xl bg-white px-5 py-2.5 font-semibold text-indigo-700 hover:bg-indigo-50">
-              ช้อปสินค้าทั้งหมด →
-            </Link>
-            <Link href="/orders" className="rounded-xl border border-white/40 px-5 py-2.5 font-semibold hover:bg-white/10">
-              ตรวจสอบคำสั่งซื้อ
-            </Link>
+          <div className="mt-[var(--space-md)] flex flex-wrap gap-[var(--space-xs)]">
+            <Link href="/products" className="btn btn--sm btn--quiet">ดูสินค้าทั้งหมด</Link>
+            <Link href="/orders" className="btn btn--sm btn--quiet">ตรวจสอบคำสั่งซื้อ</Link>
           </div>
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <h2 className="text-lg font-bold text-slate-900">เลือกตามหมวดหมู่</h2>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {/* หมวดหมู่เป็นถาดพลาสติก */}
+      <section className="container section--tight" aria-labelledby="home-categories">
+        <h2 id="home-categories" className="visually-hidden">เลือกตามหมวดหมู่</h2>
+        <div className="grid grid-cols-2 gap-[var(--gap-columns)] md:grid-cols-4">
           {CATEGORIES.map((c, i) => (
             <Link
               key={c.value}
               href={`/products?category=${c.value}`}
-              className="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className={`plastic plastic--${["mon", "tue", "", "fri"][i]} flex flex-col items-start gap-[var(--space-xs)] p-[var(--space-lg)] no-underline transition-[transform] duration-[var(--dur-micro)] motion-safe:hover:-translate-y-[2px]`}
             >
-              <span className="text-3xl">{["🤓", "😎", "🔮", "🧰"][i]}</span>
-              <div className="mt-2 font-semibold text-slate-700">{c.label}</div>
+              <span style={{ color: "var(--color-ink)" }}>
+                <FrameMark kind={TILE_KINDS[i]} />
+              </span>
+              <span style={{ fontWeight: 500, color: "var(--color-ink)" }}>{c.label}</span>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Featured */}
-      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">สินค้ามาใหม่ 🆕</h2>
-          <Link href="/products" className="text-sm font-medium text-indigo-600 hover:underline">
-            ดูทั้งหมด →
+      {/* สินค้ามาใหม่ */}
+      <section className="container section--tight" aria-labelledby="home-new">
+        <div className="flex flex-wrap items-baseline justify-between gap-[var(--space-sm)]">
+          <h2 id="home-new">สินค้ามาใหม่ในร้าน</h2>
+          <Link href="/products" className="text-sm no-underline hover:underline" style={{ color: "var(--color-accent-deep)" }}>
+            ดูสินค้าทั้งหมดของร้าน
           </Link>
         </div>
         {loading ? (
-          <Spinner label="กำลังโหลดสินค้า…" />
+          <Spinner label="กำลังโหลดสินค้า" />
         ) : (
-          <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid-products mt-[var(--space-xl)]">
             {products.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
         )}
+      </section>
+
+      {/* ปิดท้ายด้วยข้อเท็จจริงของการซื้อ: โอนเงิน ตรวจสลิป จัดส่ง */}
+      <section className="band" aria-labelledby="home-terms">
+        <div className="container section--tight">
+          <h2 id="home-terms">ซื้อง่ายด้วยสามขั้นตอนจริงของร้าน</h2>
+          <div className="stat-row mt-[var(--space-lg)]" style={{ gap: "var(--space-lg)" }}>
+            <div className="stack" style={{ gap: "var(--space-2xs)" }}>
+              <p className="font-medium">โอนเงินแนบสลิป</p>
+              <p className="text-sm" style={{ color: "var(--color-muted)" }}>
+                ชำระผ่านบัญชีธนาคารหรือพร้อมเพย์ แล้วอัปโหลดสลิปในหน้าคำสั่งซื้อ
+              </p>
+            </div>
+            <div className="stack" style={{ gap: "var(--space-2xs)" }}>
+              <p className="font-medium">ร้านตรวจสอบทุกสลิป</p>
+              <p className="text-sm" style={{ color: "var(--color-muted)" }}>
+                แอดมินเทียบยอดกับคำสั่งซื้อก่อนหักสต็อก สลิปไม่ตรงส่งใหม่ได้
+              </p>
+            </div>
+            <div className="stack" style={{ gap: "var(--space-2xs)" }}>
+              <p className="font-medium">จัดส่ง 1 ถึง 2 วันทำการ</p>
+              <p className="text-sm" style={{ color: "var(--color-muted)" }}>
+                ส่งฟรีเมื่อสั่งครบ 1,500 บาท ติดตามสถานะได้ตลอด 24 ชั่วโมง
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );

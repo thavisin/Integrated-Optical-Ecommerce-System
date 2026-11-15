@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useState, type ChangeEvent } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { api, media } from "@/lib/api";
 import type { Order } from "@/lib/types";
 import { THB, formatDateTime, orderNo, ORDER_STATUS, ORDER_TIMELINE_STEPS } from "@/lib/format";
@@ -47,7 +48,7 @@ function OrderDetailContent() {
       fd.append("slip", newSlip);
       await api(`/api/orders/${id}/slip`, { method: "POST", body: fd });
       setNewSlip(null);
-      setNotice("ส่งสลิปเรียบร้อยแล้ว รอแอดมินตรวจสอบ 🔍");
+      setNotice("ส่งสลิปเรียบร้อย ร้านจะตรวจสอบและอัปเดตสถานะให้");
       await load();
     } catch (e: any) {
       setError(e.message);
@@ -57,7 +58,7 @@ function OrderDetailContent() {
   };
 
   const cancelOrder = async () => {
-    if (!confirm("ยืนยันการยกเลิกคำสั่งซื้อนี้?")) return;
+    if (!confirm("ยืนยันการยกเลิกคำสั่งซื้อนี้")) return;
     setBusy(true);
     try {
       await api(`/api/orders/${id}/cancel`, { method: "POST" });
@@ -70,182 +71,194 @@ function OrderDetailContent() {
     }
   };
 
-  if (loading) return <Spinner label="กำลังโหลดคำสั่งซื้อ…" />;
+  if (loading) return <Spinner label="กำลังโหลดคำสั่งซื้อ" />;
   if (error && !order)
     return (
-      <div className="mx-auto max-w-3xl px-4 py-12">
-        <EmptyState icon="😕" title={error}>
-          <Link href="/orders" className="mt-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white">
-            กลับไปหน้าคำสั่งซื้อ
-          </Link>
+      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+        <EmptyState icon="warn" title={error}>
+          <Link href="/orders" className="btn btn--sm mt-[var(--space-2xs)]">กลับไปหน้าคำสั่งซื้อ</Link>
         </EmptyState>
       </div>
     );
   if (!order) return null;
 
   const step = ORDER_STATUS[order.status]?.step ?? -1;
-  const canUpload = ["AWAITING_PAYMENT", "REJECTED"].includes(order.status) || (order.status === "PENDING_VERIFY");
+  const canUpload = ["AWAITING_PAYMENT", "PENDING_VERIFY", "REJECTED"].includes(order.status);
   const canCancel = ["AWAITING_PAYMENT", "PENDING_VERIFY", "REJECTED"].includes(order.status);
   const isSlipPdf = order.slipUrl?.toLowerCase().endsWith(".pdf");
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <Link href="/orders" className="text-sm text-slate-500 hover:text-indigo-600">← กลับไปหน้าคำสั่งซื้อ</Link>
+    <div className="container max-w-4xl" style={{ paddingBlock: "var(--space-lg) var(--section-gap-s)" }}>
+      <Link href="/orders" className="inline-flex items-center gap-[var(--space-2xs)] text-sm no-underline hover:underline" style={{ color: "var(--color-muted)" }}>
+        <ArrowLeft size={14} weight="bold" aria-hidden="true" /> กลับไปหน้าคำสั่งซื้อ
+      </Link>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-extrabold text-slate-900">คำสั่งซื้อ {orderNo(order.id)}</h1>
+      <div className="mt-[var(--space-sm)] flex flex-wrap items-center justify-between gap-[var(--space-sm)]">
+        <h1>
+          คำสั่งซื้อ <span className="num">{orderNo(order.id)}</span>
+        </h1>
+        {order.status === "COMPLETED" && <span className="stamp">ตรวจรับแล้ว</span>}
         <StatusBadge status={order.status} />
       </div>
-      <p className="mt-1 text-sm text-slate-500">สั่งเมื่อ {formatDateTime(order.createdAt)} น.</p>
+      <p className="num text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+        สั่งเมื่อ {formatDateTime(order.createdAt)} น.
+      </p>
 
-      {notice && (
-        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          ✓ {notice}
-        </div>
-      )}
-      {error && <div className="mt-4"><ErrorBanner message={error} /></div>}
+      {notice && <div className="noty mt-[var(--space-md)]" role="status">{notice}</div>}
+      {error && <div className="mt-[var(--space-md)]"><ErrorBanner message={error} /></div>}
       {order.status === "REJECTED" && order.note && (
-        <div className="mt-4"><ErrorBanner message={`สลิปถูกปฏิเสธ: ${order.note} — กรุณาอัปโหลดสลิปใหม่ด้านล่าง`} /></div>
+        <div className="mt-[var(--space-md)]"><ErrorBanner message={`สลิปไม่ผ่านการตรวจ: ${order.note} กรุณาโอนเงินใหม่แล้วส่งสลิปด้านล่าง`} /></div>
       )}
       {order.status === "CANCELLED" && order.note && (
-        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-600">
-          ยกเลิกแล้ว: {order.note}
+        <div className="noty mt-[var(--space-md)]" style={{ background: "var(--color-paper-2)", color: "var(--color-ink-2)", borderColor: "var(--color-rule)" }}>
+          ยกเลิกแล้วเนื่องจาก {order.note}
         </div>
       )}
 
-      {/* Timeline */}
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+      {/* สถานะเป็นแถบฉลาก */}
+      <section className="card mt-[var(--space-lg)] p-[var(--space-lg)]" aria-labelledby="od-status">
+        <h2 id="od-status" className="visually-hidden">สถานะคำสั่งซื้อ</h2>
         {step >= 0 ? (
-          <ol className="grid grid-cols-5 gap-1">
-            {ORDER_TIMELINE_STEPS.map((s, i) => {
-              const done = i <= step;
-              const current = i === step;
-              return (
-                <li key={s.key} className="flex flex-col items-center gap-2 text-center">
-                  <span
-                    className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm transition ${
-                      done ? "border-indigo-600 bg-indigo-600 text-white" : "border-slate-200 bg-white text-slate-300"
-                    } ${current ? "ring-4 ring-indigo-100" : ""}`}
-                  >
-                    {done ? s.icon : "○"}
-                  </span>
-                  <span className={`text-[11px] leading-tight sm:text-xs ${done ? "font-semibold text-slate-700" : "text-slate-400"}`}>
-                    {s.label}
-                  </span>
-                </li>
-              );
-            })}
+          <ol className="steps">
+            {ORDER_TIMELINE_STEPS.map((s, i) => (
+              <li
+                key={s.key}
+                className={i < step ? "is-done" : i === step ? "is-now" : ""}
+                aria-current={i === step ? "step" : undefined}
+              >
+                {s.label}
+              </li>
+            ))}
           </ol>
         ) : (
-          <p className="text-center text-sm text-slate-500">
-            คำสั่งซื้อนี้{ORDER_STATUS[order.status]?.label} — ไม่แสดง timeline
+          <p className="text-sm" style={{ color: "var(--color-muted)" }}>
+            คำสั่งซื้อนี้{ORDER_STATUS[order.status]?.label} จึงไม่แสดงลำดับสถานะ
           </p>
         )}
       </section>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-[1fr_320px]">
-        <div className="space-y-6">
-          {/* items */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h2 className="font-bold text-slate-800">รายการสินค้า</h2>
-            <div className="mt-4 space-y-4">
+      <div className="mt-[var(--space-lg)] grid gap-[var(--space-lg)] md:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="stack-lg">
+          {/* รายการสินค้า */}
+          <section className="card p-[var(--space-lg)]" aria-labelledby="od-items">
+            <h2 id="od-items" style={{ fontSize: "var(--text-title)" }}>รายการสินค้า</h2>
+            <ul className="mt-[var(--space-md)] space-y-[var(--space-md)]">
               {order.items.map((it) => (
-                <div key={it.id} className="flex items-center gap-4">
-                  <Link href={`/products/${it.productId}`} className="h-16 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                <li key={it.id} className="flex items-center gap-[var(--space-md)]">
+                  <Link
+                    href={`/products/${it.productId}`}
+                    className="frame"
+                    style={{ width: "4rem", height: "3rem", borderRadius: "var(--radius-input)", flexShrink: 0 }}
+                    aria-label={`ดูสินค้า ${it.product?.name ?? it.productId}`}
+                  >
                     {it.product?.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={media(it.product.imageUrl)} alt={it.product.name} className="h-full w-full object-cover" />
+                      <img src={media(it.product.imageUrl)} alt={it.product.name} loading="lazy" width={64} height={48} />
                     ) : (
-                      <span className="flex h-full items-center justify-center text-2xl">🕶️</span>
+                      <span aria-hidden="true" className="h-full w-full" />
                     )}
                   </Link>
                   <div className="min-w-0 flex-1">
-                    <Link href={`/products/${it.productId}`} className="line-clamp-1 font-medium hover:text-indigo-600">
-                      {it.product?.name ?? `สินค้า #${it.productId}`}
+                    <Link href={`/products/${it.productId}`} className="line-clamp-1 font-medium no-underline hover:underline">
+                      {it.product?.name ?? `สินค้าหมายเลข ${it.productId}`}
                     </Link>
-                    <p className="text-xs text-slate-400">
-                      {it.quantity} × {THB(it.price)}
+                    <p className="num text-xs" style={{ color: "var(--color-muted)" }}>
+                      {it.quantity} ชิ้น ชิ้นละ {THB(it.price)}
                     </p>
                   </div>
-                  <span className="font-bold">{THB(it.price * it.quantity)}</span>
-                </div>
+                  <span className="num font-bold">{THB(it.price * it.quantity)}</span>
+                </li>
               ))}
-            </div>
-            <div className="mt-4 flex justify-between border-t border-slate-100 pt-4 text-lg font-extrabold">
+            </ul>
+            <p className="mt-[var(--space-md)] flex justify-between border-t pt-[var(--space-md)] text-lg font-extrabold" style={{ borderColor: "var(--color-rule)" }}>
               <span>ยอดรวม</span>
-              <span className="text-indigo-600">{THB(order.total)}</span>
-            </div>
+              <span className="num" style={{ color: "var(--color-accent-deep)" }}>{THB(order.total)}</span>
+            </p>
           </section>
 
-          {/* slip */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h2 className="font-bold text-slate-800">สลิปการโอนเงิน</h2>
+          {/* สลิป */}
+          <section aria-labelledby="od-slip">
+            <h2 id="od-slip" style={{ fontSize: "var(--text-title)" }}>สลิปการโอนเงิน</h2>
             {order.slipUrl ? (
               isSlipPdf ? (
                 <a
                   href={media(order.slipUrl)}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-3 inline-block rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50"
+                  className="btn btn--sm btn--quiet mt-[var(--space-md)]"
                 >
-                  📄 เปิดไฟล์สลิป (PDF)
+เปิดไฟล์สลิป PDF
                 </a>
               ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={media(order.slipUrl)}
-                  alt="สลิปโอนเงิน"
-                  className="mt-3 max-h-96 rounded-xl border border-slate-100 object-contain"
-                />
+                <div className="slip-frame mt-[var(--space-md)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={media(order.slipUrl)} alt="สลิปโอนเงินของคำสั่งซื้อนี้" loading="lazy" />
+                </div>
               )
             ) : (
-              <p className="mt-3 text-sm text-slate-500">ยังไม่ได้แนบสลิป</p>
+              <p className="mt-[var(--space-sm)] text-sm" style={{ color: "var(--color-muted)" }}>
+                ยังไม่ได้แนบสลิป โอนเงินตามยอดด้านบนแล้วเลือกไฟล์ด้านล่างได้เลย
+              </p>
             )}
 
             {canUpload && (
-              <div className="mt-4 rounded-xl bg-slate-50 p-4">
-                <p className="text-sm font-medium text-slate-600">
-                  {order.slipUrl ? "ส่งสลิปใหม่ (กรณีสลิปเดิมไม่ผ่านการตรวจสอบ)" : "แนบสลิปการโอนเงิน"}
+              <div className="well mt-[var(--space-md)] p-[var(--space-md)]">
+                <p className="text-sm font-medium" style={{ color: "var(--color-ink-2)" }}>
+                  {order.slipUrl ? "ส่งสลิปใหม่กรณีไฟล์เดิมไม่ตรงยอด" : "แนบสลิปการโอนเงิน"}
                 </p>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <label className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm hover:bg-slate-50">
-                    เลือกไฟล์…
-                    <input type="file" accept="image/*,application/pdf" className="hidden" onChange={onPickSlip} />
-                  </label>
+                <div className="mt-[var(--space-xs)] flex flex-wrap items-center gap-[var(--space-xs)]">
+                  <div>
+                    <label htmlFor="od-newslip" className="btn btn--sm btn--quiet cursor-pointer">
+                      เลือกไฟล์สลิป
+                    </label>
+                    <input
+                      id="od-newslip"
+                      type="file"
+                      accept="image/*,application/pdf"
+                      className="sr-only"
+                      style={{ position: "absolute", width: "1px", height: "1px", opacity: 0 }}
+                      onChange={onPickSlip}
+                    />
+                  </div>
                   <button
+                    type="button"
                     onClick={uploadSlip}
                     disabled={!newSlip || busy}
-                    className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-40"
+                    className="btn btn--sm btn--primary"
+                    aria-busy={busy}
                   >
-                    {busy ? "กำลังส่ง…" : "ส่งสลิปให้แอดมิน 📤"}
+ส่งสลิปให้ร้าน
                   </button>
-                  {newSlip && <span className="text-xs text-emerald-600">✓ {newSlip.name}</span>}
+                  {newSlip && <span className="text-xs" style={{ color: "var(--color-accent-deep)" }}>เลือกแล้ว: {newSlip.name}</span>}
                 </div>
               </div>
             )}
           </section>
         </div>
 
-        {/* side info */}
-        <div className="h-fit space-y-4">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 text-sm">
-            <h2 className="font-bold text-slate-800">ที่อยู่จัดส่ง</h2>
-            <p className="mt-3 font-medium text-slate-700">{order.shippingName}</p>
-            <p className="text-slate-500">{order.phone}</p>
-            <p className="mt-1 leading-relaxed text-slate-500">{order.address}</p>
-            {order.note && <p className="mt-2 rounded-lg bg-slate-50 p-2 text-xs text-slate-500">หมายเหตุ: {order.note}</p>}
+        {/* ข้อมูลจัดส่ง */}
+        <aside className="stack-lg">
+          <section className="pharm-label" aria-labelledby="od-ship">
+            <h2 id="od-ship" style={{ fontSize: "var(--text-xs)", fontWeight: 500, letterSpacing: 0, color: "var(--color-muted)" }}>ที่อยู่จัดส่ง</h2>
+            <p className="mt-[var(--space-xs)]" style={{ display: "grid", gap: "var(--space-2xs)" }}>
+              <span>{order.shippingName}</span>
+              <span>{order.phone}</span>
+              <span>{order.address}</span>
+              {order.note && <span style={{ color: "var(--color-muted)" }}>หมายเหตุ {order.note}</span>}
+            </p>
           </section>
 
           {canCancel && (
             <button
+              type="button"
               onClick={cancelOrder}
               disabled={busy}
-              className="w-full rounded-2xl border border-rose-200 bg-white py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 disabled:opacity-50"
+              className="btn btn--sm btn--quiet w-full"
             >
-              ยกเลิกคำสั่งซื้อ
+              ยกเลิกคำสั่งซื้อนี้
             </button>
           )}
-        </div>
+        </aside>
       </div>
     </div>
   );

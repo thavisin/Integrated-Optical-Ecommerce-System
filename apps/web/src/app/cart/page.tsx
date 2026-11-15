@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Trash } from "@phosphor-icons/react";
 import { media } from "@/lib/api";
 import { THB } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
@@ -11,10 +12,10 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-12">
-        <EmptyState icon="🛒" title="ตะกร้าสินค้าว่างเปล่า">
-          <Link href="/products" className="mt-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-600">
-            เลือกซื้อแว่นตากันเลย →
+      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+        <EmptyState icon="cart" title="ตะกร้ายังว่างอยู่">
+          <Link href="/products" className="btn btn--sm mt-[var(--space-2xs)] btn--primary">
+            เลือกซื้อแว่นตากับร้าน
           </Link>
         </EmptyState>
       </div>
@@ -22,78 +23,97 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-extrabold text-slate-900">ตะกร้าสินค้า 🛒</h1>
+    <div className="container" style={{ paddingBlock: "var(--space-lg) var(--section-gap-s)" }}>
+      <h1>ตะกร้าสินค้า</h1>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
-        <div className="space-y-3">
-          {items.map((item) => (
-            <div
-              key={item.productId}
-              className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4"
-            >
-              <Link href={`/products/${item.productId}`} className="h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                {item.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={media(item.imageUrl)} alt={item.name} className="h-full w-full object-cover" />
-                ) : (
-                  <span className="flex h-full items-center justify-center text-3xl">🕶️</span>
-                )}
-              </Link>
-
-              <div className="min-w-0 flex-1">
-                <Link href={`/products/${item.productId}`} className="line-clamp-1 font-semibold hover:text-indigo-600">
-                  {item.name}
+      <div className="mt-[var(--space-xl)] grid gap-[var(--space-lg)] lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="card p-[var(--space-lg)]">
+          <ul className="stack" style={{ gap: "var(--space-lg)" }}>
+            {items.map((item) => (
+              <li key={item.productId} className="flex flex-wrap items-center gap-[var(--space-md)]">
+                <Link
+                  href={`/products/${item.productId}`}
+                  className="frame"
+                  style={{ width: "5rem", height: "3.75rem", borderRadius: "var(--radius-input)", flexShrink: 0 }}
+                  aria-label={`ดูรายละเอียด ${item.name}`}
+                >
+                  {item.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={media(item.imageUrl)} alt={item.name} loading="lazy" width={80} height={60} />
+                  ) : (
+                    <span aria-hidden="true" className="h-full w-full" />
+                  )}
                 </Link>
-                <div className="text-xs text-slate-400">{item.brand}</div>
-                <div className="mt-1 font-bold text-indigo-600">{THB(item.price)}</div>
-              </div>
 
-              <div className="flex items-center rounded-xl border border-slate-200">
-                <button onClick={() => setQty(item.productId, item.quantity - 1)} className="px-3 py-2 text-lg">
-                  −
+                <div className="min-w-0 flex-1">
+                  <Link href={`/products/${item.productId}`} className="line-clamp-1 font-medium no-underline hover:underline">
+                    {item.name}
+                  </Link>
+                  <p className="text-xs" style={{ color: "var(--color-muted)" }}>{item.brand}</p>
+                  <p className="num mt-[var(--space-2xs)]" style={{ color: "var(--color-ink)", fontSize: "var(--text-sm)" }}>
+                    {THB(item.price)}
+                  </p>
+                </div>
+
+                <div className="flex items-center" style={{ border: "1px solid var(--color-rule)", borderRadius: "var(--radius-input)" }}>
+                  <button
+                    type="button"
+                    onClick={() => setQty(item.productId, item.quantity - 1)}
+                    aria-label={`ลดจำนวน ${item.name}`}
+                    className="icon-btn"
+                    style={{ width: "2.5rem", height: "2.5rem", fontSize: "var(--text-md)" }}
+                  >
+                    −
+                  </button>
+                  <span className="num" style={{ minWidth: "2rem", textAlign: "center", fontSize: "var(--text-sm)" }}>{item.quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQty(item.productId, item.quantity + 1)}
+                    aria-label={`เพิ่มจำนวน ${item.name}`}
+                    className="icon-btn"
+                    style={{ width: "2.5rem", height: "2.5rem", fontSize: "var(--text-md)" }}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <p className="num w-[6rem] text-right font-medium" style={{ fontSize: "var(--text-sm)" }}>
+                  {THB(item.price * item.quantity)}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => remove(item.productId)}
+                  className="icon-btn"
+                  style={{ color: "var(--color-muted)" }}
+                  aria-label={`นำ ${item.name} ออกจากตะกร้า`}
+                >
+                  <Trash size={16} weight="bold" aria-hidden="true" />
                 </button>
-                <span className="w-8 text-center text-sm font-semibold">{item.quantity}</span>
-                <button onClick={() => setQty(item.productId, item.quantity + 1)} className="px-3 py-2 text-lg">
-                  +
-                </button>
-              </div>
-
-              <div className="w-24 text-right font-bold">{THB(item.price * item.quantity)}</div>
-
-              <button
-                onClick={() => remove(item.productId)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                aria-label="ลบสินค้า"
-              >
-                🗑️
-              </button>
-            </div>
-          ))}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div className="h-fit rounded-2xl border border-slate-200 bg-white p-5">
-          <h2 className="font-bold text-slate-800">สรุปคำสั่งซื้อ</h2>
-          <div className="mt-4 space-y-2 text-sm text-slate-600">
-            <div className="flex justify-between">
+        <aside className="card h-fit p-[var(--space-lg)]">
+          <h2 style={{ fontSize: "var(--text-title)" }}>สรุปคำสั่งซื้อ</h2>
+          <div className="mt-[var(--space-md)] space-y-[var(--space-sm)] text-sm" style={{ color: "var(--color-ink-2)" }}>
+            <p className="flex justify-between">
               <span>จำนวนสินค้า</span>
-              <span>{items.reduce((s, i) => s + i.quantity, 0)} ชิ้น</span>
-            </div>
-            <div className="flex justify-between border-t border-slate-100 pt-3 text-base font-bold text-slate-900">
+              <span className="num">{items.reduce((s, i) => s + i.quantity, 0)} ชิ้น</span>
+            </p>
+            <p className="flex justify-between border-t pt-[var(--space-sm)] text-base font-bold" style={{ borderColor: "var(--color-rule)", color: "var(--color-ink)" }}>
               <span>ยอดรวม</span>
-              <span className="text-indigo-600">{THB(total)}</span>
-            </div>
+              <span className="num" style={{ color: "var(--color-accent-deep)" }}>{THB(total)}</span>
+            </p>
           </div>
-          <Link
-            href="/checkout"
-            className="mt-5 block rounded-xl bg-indigo-600 py-3 text-center font-semibold text-white transition hover:bg-indigo-500"
-          >
-            ดำเนินการสั่งซื้อ →
+          <Link href="/checkout" className="btn btn--primary mt-[var(--space-lg)] w-full">
+            ดำเนินการสั่งซื้อ
           </Link>
-          <Link href="/products" className="mt-2 block text-center text-sm text-slate-500 hover:text-indigo-600">
+          <Link href="/products" className="mt-[var(--space-sm)] block text-center text-sm no-underline hover:underline" style={{ color: "var(--color-muted)" }}>
             เลือกซื้อสินค้าเพิ่ม
           </Link>
-        </div>
+        </aside>
       </div>
     </div>
   );

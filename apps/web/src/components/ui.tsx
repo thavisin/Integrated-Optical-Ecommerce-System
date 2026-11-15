@@ -1,28 +1,36 @@
+"use client";
+
+import { CircleNotch, Warning, Package } from "@phosphor-icons/react";
+
 export function Spinner({ label }: { label?: string }) {
   return (
-    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 py-16 text-slate-500">
-      <span className="h-8 w-8 animate-spin rounded-full border-[3px] border-slate-200 border-t-indigo-600" />
+    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-[var(--space-sm)] py-16" style={{ color: "var(--color-muted)" }}>
+      <CircleNotch size={28} weight="bold" aria-hidden="true" className="keep-motion animate-spin" />
       {label && <span className="text-sm">{label}</span>}
+      <span className="visually-hidden" role="status">{label || "กำลังโหลด"}</span>
     </div>
   );
 }
 
-export default Spinner;
-
 export function ErrorBanner({ message }: { message: string }) {
   return (
-    <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-      ⚠️ {message}
+    <div className="noty noty--err" role="alert" style={{ display: "flex", alignItems: "flex-start", gap: "var(--space-2xs)" }}>
+      <Warning size={16} weight="bold" aria-hidden="true" style={{ flexShrink: 0, marginTop: "0.2em" }} />
+      <span>{message}</span>
     </div>
   );
 }
 
 export function EmptyState({ icon, title, children }: { icon: string; title: string; children?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center">
-      <span className="text-5xl">{icon}</span>
-      <p className="font-medium text-slate-600">{title}</p>
+    <div
+      className="flex flex-col items-center justify-center gap-[var(--space-sm)] rounded-[var(--radius-card)] py-20 text-center"
+      style={{ border: "1px dashed var(--color-rule)", background: "var(--color-paper)" }}
+    >
+      <span aria-hidden="true"><Package size={40} weight="light" style={{ color: "var(--color-muted)" }} /></span>
+      <p className="font-medium" style={{ color: "var(--color-ink-2)" }}>{title}</p>
       {children}
+      <span className="visually-hidden">{icon}</span>
     </div>
   );
 }

@@ -32,68 +32,77 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="mx-auto max-w-md px-4 py-12">
-      <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-center text-2xl font-extrabold text-slate-900">สมัครสมาชิก ✨</h1>
-        <p className="mt-1 text-center text-sm text-slate-500">สมัครฟรี ใช้เวลาไม่ถึง 1 นาที</p>
+    <div className="container max-w-md" style={{ paddingBlock: "var(--section-gap-s)" }}>
+      <div className="card p-[var(--space-xl)]">
+        <h1 style={{ fontSize: "var(--text-2xl)" }}>สมัครสมาชิก</h1>
+        <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+          สมัครฟรี ใช้เวลาไม่ถึงหนึ่งนาที
+        </p>
 
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium text-slate-600">ชื่อ-นามสกุล</span>
+        <form onSubmit={submit} className="mt-[var(--space-lg)] stack">
+          <div>
+            <label className="label" htmlFor="reg-name">ชื่อนามสกุล</label>
             <input
+              id="reg-name"
               required
+              name="name"
+              autoComplete="name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400"
+              className="field"
             />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-slate-600">อีเมล</span>
+          </div>
+          <div>
+            <label className="label" htmlFor="reg-email">อีเมล</label>
             <input
+              id="reg-email"
               type="email"
               required
+              name="email"
+              autoComplete="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400"
+              className="field"
             />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-slate-600">รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)</span>
+          </div>
+          <div>
+            <label className="label" htmlFor="reg-password">รหัสผ่าน อย่างน้อย 6 ตัวอักษร</label>
             <input
+              id="reg-password"
               type="password"
               required
               minLength={6}
+              name="password"
+              autoComplete="new-password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400"
+              className="field"
             />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-slate-600">ยืนยันรหัสผ่าน</span>
+          </div>
+          <div>
+            <label className="label" htmlFor="reg-confirm">ยืนยันรหัสผ่าน</label>
             <input
+              id="reg-confirm"
               type="password"
               required
+              name="confirm"
+              autoComplete="new-password"
               value={form.confirm}
               onChange={(e) => setForm({ ...form, confirm: e.target.value })}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400"
+              className="field"
             />
-          </label>
+            <p className="help" id="reg-help">{error ? "" : "ใช้อักขระอะไรก็ได้ตั้งแต่ 6 ตัวขึ้นไป"}</p>
+          </div>
 
           {error && <ErrorBanner message={error} />}
 
-          <button
-            disabled={loading}
-            className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
-          >
-            {loading ? "กำลังสมัครสมาชิก…" : "สมัครสมาชิก"}
+          <button type="submit" disabled={loading} className="btn btn--primary w-full" aria-busy={loading}>
+            {loading ? "กำลังสมัครสมาชิก" : "สมัครสมาชิก"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-slate-500">
-          มีบัญชีแล้ว?{" "}
-          <Link href="/login" className="font-semibold text-indigo-600 hover:underline">
-            เข้าสู่ระบบ
-          </Link>
+        <p className="mt-[var(--space-md)] text-center text-sm" style={{ color: "var(--color-muted)" }}>
+          มีบัญชีแล้ว <Link href="/login" className="font-medium no-underline hover:underline" style={{ color: "var(--color-accent-deep)" }}>เข้าสู่ระบบ</Link>
         </p>
       </div>
     </div>

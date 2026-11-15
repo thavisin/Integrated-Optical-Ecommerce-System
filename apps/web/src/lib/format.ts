@@ -26,24 +26,25 @@ export const categoryLabel = (v: string) => CATEGORIES.find((c) => c.value === v
 
 interface StatusMeta {
   label: string;
-  badge: string;
+  chip: string;
   step: number; // -1 = ไม่อยู่ใน timeline ปกติ
 }
 
+/* Dose: สัญญาณเขียวเดียว (สำเร็จ/ชำระแล้ว) · state ที่รออยู่หรือไม่ผ่านเป็นสีเทา */
 export const ORDER_STATUS: Record<string, StatusMeta> = {
-  AWAITING_PAYMENT: { label: "รอโอนเงิน/ส่งสลิป", badge: "bg-slate-200 text-slate-700", step: 0 },
-  PENDING_VERIFY: { label: "รอตรวจสอบสลิป", badge: "bg-amber-100 text-amber-800", step: 1 },
-  PAID: { label: "ชำระเงินแล้ว", badge: "bg-sky-100 text-sky-800", step: 2 },
-  SHIPPED: { label: "จัดส่งแล้ว", badge: "bg-indigo-100 text-indigo-800", step: 3 },
-  COMPLETED: { label: "สำเร็จ", badge: "bg-emerald-100 text-emerald-800", step: 4 },
-  REJECTED: { label: "สลิปไม่ถูกต้อง", badge: "bg-rose-100 text-rose-700", step: -1 },
-  CANCELLED: { label: "ยกเลิกแล้ว", badge: "bg-slate-200 text-slate-500", step: -1 },
+  AWAITING_PAYMENT: { label: "รอโอนเงินและสลิป", chip: "chip--outline", step: 0 },
+  PENDING_VERIFY: { label: "รอตรวจสอบสลิป", chip: "chip--outline", step: 1 },
+  PAID: { label: "ชำระเงินแล้ว", chip: "chip--ok", step: 2 },
+  SHIPPED: { label: "จัดส่งแล้ว", chip: "chip--ink", step: 3 },
+  COMPLETED: { label: "สำเร็จ", chip: "chip--mint", step: 4 },
+  REJECTED: { label: "สลิปไม่ถูกต้อง", chip: "", step: -1 },
+  CANCELLED: { label: "ยกเลิกแล้ว", chip: "chip--outline", step: -1 },
 };
 
 export const ORDER_TIMELINE_STEPS = [
-  { key: "AWAITING_PAYMENT", label: "รอโอนเงิน", icon: "🧾" },
-  { key: "PENDING_VERIFY", label: "รอตรวจสอบสลิป", icon: "🔍" },
-  { key: "PAID", label: "ชำระเงินแล้ว", icon: "💳" },
-  { key: "SHIPPED", label: "จัดส่งแล้ว", icon: "🚚" },
-  { key: "COMPLETED", label: "สำเร็จ", icon: "✅" },
+  { key: "AWAITING_PAYMENT", label: "รอโอนเงิน" },
+  { key: "PENDING_VERIFY", label: "รอตรวจสลิป" },
+  { key: "PAID", label: "ชำระแล้ว" },
+  { key: "SHIPPED", label: "จัดส่งแล้ว" },
+  { key: "COMPLETED", label: "สำเร็จ" },
 ];

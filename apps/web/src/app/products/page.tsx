@@ -64,94 +64,106 @@ function ProductsContent() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <div className="container" style={{ paddingBlock: "var(--space-2xl) var(--section-gap-s)" }}>
+      <div className="flex flex-wrap items-end justify-between gap-[var(--space-md)]">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900">สินค้าทั้งหมด 👓</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            {search ? `ผลการค้นหา "${search}" — ` : ""}
-            พบ {total} รายการ
+          <h1>สินค้าทั้งหมดของร้าน</h1>
+          <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+            {search ? `ผลการค้นหาสำหรับ "${search}" พบ ${total} รายการ` : `มีสินค้าในสต็อก ${total} รายการ`}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <form onSubmit={onSearch} className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-[var(--space-xs)]">
+          <form onSubmit={onSearch} role="search" className="flex items-center gap-[var(--space-2xs)]">
+            <label htmlFor="products-search" className="visually-hidden">ค้นหาสินค้า</label>
             <input
+              id="products-search"
+              
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="ค้นหาชื่อ/แบรนด์สินค้า…"
-              className="w-56 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400"
+              placeholder="ค้นหาชื่อหรือแบรนด์"
+              className="field field-sm"
+              style={{ width: "13rem" }}
             />
-            <button className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-600">
-              ค้นหา
-            </button>
+            <button className="btn btn--sm btn--quiet">ค้นหา</button>
           </form>
-          <select
-            value={category}
-            onChange={(e) => updateParam("category", e.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-indigo-400"
-          >
-            <option value="">ทุกหมวดหมู่</option>
-            {CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-          <select
-            value={sort}
-            onChange={(e) => updateParam("sort", e.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-indigo-400"
-          >
-            <option value="newest">มาใหม่ก่อน</option>
-            <option value="price_asc">ราคา: ต่ำ → สูง</option>
-            <option value="price_desc">ราคา: สูง → ต่ำ</option>
-            <option value="name">ชื่อ A → Z</option>
-          </select>
+          <div>
+            <label htmlFor="products-category" className="visually-hidden">กรองตามหมวดหมู่</label>
+            <select
+              id="products-category"
+              value={category}
+              onChange={(e) => updateParam("category", e.target.value)}
+              className="field field-sm"
+            >
+              <option value="">ทุกหมวดหมู่</option>
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="products-sort" className="visually-hidden">เรียงลำดับ</label>
+            <select
+              id="products-sort"
+              value={sort}
+              onChange={(e) => updateParam("sort", e.target.value)}
+              className="field field-sm"
+            >
+              <option value="newest">มาใหม่ก่อน</option>
+              <option value="price_asc">ราคาน้อยไปมาก</option>
+              <option value="price_desc">ราคามากไปน้อย</option>
+              <option value="name">ชื่อก่อนหน้าหลัง</option>
+            </select>
+          </div>
         </div>
       </div>
 
       {error ? (
-        <EmptyState icon="⚠️" title={error} />
+        <EmptyState icon="warn" title={error} />
       ) : loading ? (
-        <Spinner label="กำลังโหลดสินค้า…" />
+        <Spinner label="กำลังโหลดสินค้า" />
       ) : products.length === 0 ? (
-        <EmptyState icon="🔍" title={`ไม่พบสินค้า${search ? ` สำหรับ "${search}"` : ""}`}>
+        <EmptyState icon="search" title={`ไม่พบสินค้า${search ? ` สำหรับ "${search}"` : ""}`}>
           <button
+            type="button"
             onClick={() => router.push("/products")}
-            className="mt-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-600"
+            className="btn btn--sm mt-[var(--space-2xs)]"
           >
-            ล้างตัวกรองทั้งหมด
+            ล้างการค้นหาและตัวกรอง
           </button>
         </EmptyState>
       ) : (
         <>
-          <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid-products mt-[var(--space-xl)]">
             {products.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
 
           {pages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-2">
+            <nav className="mt-[var(--space-xl)] flex items-center justify-center gap-[var(--space-xs)]" aria-label="แบ่งหน้าสินค้า">
               <button
+                type="button"
                 disabled={page <= 1}
                 onClick={() => updateParam("page", String(page - 1))}
-                className="rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm disabled:opacity-40"
+                className="btn btn--sm btn--quiet"
               >
-                ← ก่อนหน้า
+                ก่อนหน้า
               </button>
-              <span className="px-3 text-sm text-slate-600">
-                หน้า {page} / {pages}
+              <span className="num text-sm" style={{ padding: "0 var(--space-sm)", color: "var(--color-muted)" }}>
+                {page} / {pages}
               </span>
               <button
+                type="button"
                 disabled={page >= pages}
                 onClick={() => updateParam("page", String(page + 1))}
-                className="rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm disabled:opacity-40"
+                className="btn btn--sm btn--quiet"
               >
-                ถัดไป →
+                ถัดไป
               </button>
-            </div>
+            </nav>
           )}
         </>
       )}

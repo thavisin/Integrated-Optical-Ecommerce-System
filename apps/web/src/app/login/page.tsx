@@ -29,55 +29,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-md flex-col px-4 py-12">
-      <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-center text-2xl font-extrabold text-slate-900">เข้าสู่ระบบ 👋</h1>
-        <p className="mt-1 text-center text-sm text-slate-500">เข้าสู่ระบบเพื่อสั่งซื้อและติดตามคำสั่งซื้อ</p>
+    <div className="container max-w-md" style={{ paddingBlock: "var(--section-gap-s)" }}>
+      <div className="card p-[var(--space-xl)]">
+        <h1 style={{ fontSize: "var(--text-2xl)" }}>เข้าสู่ระบบ</h1>
+        <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+          เข้าสู่ระบบเพื่อสั่งซื้อและติดตามคำสั่งซื้อ
+        </p>
 
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          <label className="block">
-            <span className="text-sm font-medium text-slate-600">อีเมล</span>
+        <form onSubmit={submit} className="mt-[var(--space-lg)] stack">
+          <div>
+            <label className="label" htmlFor="login-email">อีเมล</label>
             <input
+              id="login-email"
               type="email"
               required
+              name="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400"
+              className="field"
             />
-          </label>
-          <label className="block">
-            <span className="text-sm font-medium text-slate-600">รหัสผ่าน</span>
+          </div>
+          <div>
+            <label className="label" htmlFor="login-password">รหัสผ่าน</label>
             <input
+              id="login-password"
               type="password"
               required
+              name="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm outline-none focus:border-indigo-400"
+              className="field"
             />
-          </label>
+          </div>
 
           {error && <ErrorBanner message={error} />}
 
-          <button
-            disabled={loading}
-            className="w-full rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
-          >
-            {loading ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
+          <button disabled={loading} className="btn btn--primary w-full" aria-busy={loading}>
+            {loading ? "กำลังตรวจสอบ" : "เข้าสู่ระบบ"}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-slate-500">
-          ยังไม่มีบัญชี?{" "}
-          <Link href="/register" className="font-semibold text-indigo-600 hover:underline">
-            สมัครสมาชิกฟรี
-          </Link>
+        <p className="mt-[var(--space-md)] text-center text-sm" style={{ color: "var(--color-muted)" }}>
+          ยังไม่มีบัญชี <Link href="/register" className="font-medium no-underline hover:underline" style={{ color: "var(--color-accent-deep)" }}>สมัครสมาชิกฟรี</Link>
         </p>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white/60 p-4 text-xs text-slate-500">
-        <p className="font-semibold text-slate-600">บัญชีทดสอบระบบ (seed)</p>
-        <p className="mt-1">👤 ลูกค้า: customer@example.com / customer123</p>
-        <p>🛡️ แอดมิน: admin@optimart.com / admin123</p>
+      <div className="pharm-label mt-[var(--space-md)]">
+        <p className="pharm-head">
+          <span>บัญชีทดลองของระบบ</span>
+          <span>demo</span>
+        </p>
+        <p className="mt-[var(--space-xs)]" style={{ display: "grid", gap: "var(--space-2xs)" }}>
+          <span>ลูกค้า customer@example.com / customer123</span>
+          <span>แอดมิน admin@optimart.com / admin123</span>
+        </p>
       </div>
     </div>
   );

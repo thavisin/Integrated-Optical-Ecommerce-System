@@ -26,3 +26,6 @@ apps/server/public/uploads/products/*
 npm-debug.log*
 .vscode/
 .idea/
+
+# hallmark redesign working files (screenshots, before/kept records, log)
+.hallmark/

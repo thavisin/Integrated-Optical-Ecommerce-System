@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { X } from "@phosphor-icons/react";
 import { api, media } from "@/lib/api";
 import type { Order } from "@/lib/types";
 import { THB, formatDateTime, orderNo, ORDER_STATUS } from "@/lib/format";
@@ -11,10 +12,10 @@ const FILTER_TABS = [
   { value: "", label: "ทั้งหมด" },
   { value: "AWAITING_PAYMENT", label: "รอโอนเงิน" },
   { value: "PENDING_VERIFY", label: "รอตรวจสลิป" },
-  { value: "PAID", label: "ชำระเงินแล้ว" },
+  { value: "PAID", label: "ชำระแล้ว" },
   { value: "SHIPPED", label: "จัดส่งแล้ว" },
   { value: "COMPLETED", label: "สำเร็จ" },
-  { value: "REJECTED", label: "ปฏิเสธ" },
+  { value: "REJECTED", label: "ไม่ผ่าน" },
   { value: "CANCELLED", label: "ยกเลิก" },
 ];
 
@@ -55,7 +56,7 @@ export default function AdminOrdersPage() {
         method: "PATCH",
         body: JSON.stringify({ status, note }),
       });
-      showNotice(`อัปเดตคำสั่งซื้อ ${orderNo(order.id)} → ${ORDER_STATUS[status]?.label ?? status} เรียบร้อย`);
+      showNotice(`อัปเดต ${orderNo(order.id)} เป็น ${ORDER_STATUS[status]?.label ?? status} แล้ว`);
       setSlipOrder(null);
       await load();
     } catch (e: any) {
@@ -66,7 +67,7 @@ export default function AdminOrdersPage() {
   };
 
   const reject = async (order: Order) => {
-    const reason = window.prompt(`เหตุผลที่ปฏิเสธสลิปคำสั่งซื้อ ${orderNo(order.id)} (จะแสดงให้ลูกค้าเห็น):`);
+    const reason = window.prompt(`เหตุผลที่สลิปของ ${orderNo(order.id)} ไม่ผ่าน จะแสดงให้ลูกค้าเห็น`);
     if (!reason?.trim()) return;
     await updateStatus(order, "REJECTED", reason);
   };
@@ -75,186 +76,189 @@ export default function AdminOrdersPage() {
   const countByStatus = (s: string) => (s ? orders.filter((o) => o.status === s).length : orders.length);
 
   return (
-    <div>
-      <h1 className="text-2xl font-extrabold text-slate-900">🛒 คำสั่งซื้อ / ตรวจสอบสลิป</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        ดูสลิปโอนเงิน เทียบยอดเงิน แล้วอนุมัติ / ปฏิเสธ / จัดส่งได้จากที่นี่
-      </p>
+    <div className="stack-lg">
+      <div>
+        <h1>คำสั่งซื้อและการตรวจสลิป</h1>
+        <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+          เปิดสลิป เทียบยอดกับคำสั่งซื้อ แล้วอนุมัติหรือแจ้งเหตุผลกลับลูกค้า
+        </p>
+      </div>
 
-      {notice && (
-        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">✓ {notice}</div>
-      )}
-      {error && <div className="mt-4"><ErrorBanner message={error} /></div>}
+      {notice && <div className="noty" role="status">{notice}</div>}
+      {error && <ErrorBanner message={error} />}
 
-      {/* status tabs */}
-      <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+      <div className="seg flex-wrap" role="group" aria-label="กรองคำสั่งซื้อตามสถานะ">
         {FILTER_TABS.map((t) => (
           <button
             key={t.value}
+            type="button"
             onClick={() => setFilter(t.value)}
-            className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition ${
-              filter === t.value
-                ? "bg-indigo-600 text-white"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-            }`}
+            aria-pressed={filter === t.value}
           >
-            {t.label} ({countByStatus(t.value)})
+            {t.label} <span className="num">{countByStatus(t.value)}</span>
           </button>
         ))}
       </div>
 
       {loading ? (
-        <Spinner label="กำลังโหลดคำสั่งซื้อ…" />
+        <Spinner label="กำลังโหลดคำสั่งซื้อ" />
       ) : filtered.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
+        <div className="card p-[var(--space-2xl)] text-center text-sm" style={{ color: "var(--color-muted)" }}>
           ไม่มีคำสั่งซื้อในสถานะนี้
         </div>
       ) : (
-        <div className="mt-5 space-y-3">
+        <div className="stack-lg">
           {filtered.map((order) => (
-            <div key={order.id} className="rounded-2xl border border-slate-200 bg-white p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
+            <article key={order.id} className="card p-[var(--space-lg)]">
+              <div className="flex flex-wrap items-start justify-between gap-[var(--space-sm)]">
                 <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-bold text-slate-900">{orderNo(order.id)}</span>
+                  <div className="flex flex-wrap items-center gap-[var(--space-xs)]">
+                    <h2 className="num" style={{ fontSize: "var(--text-md)", letterSpacing: 0 }}>{orderNo(order.id)}</h2>
                     <StatusBadge status={order.status} />
-                    {order.status === "PENDING_VERIFY" && (
-                      <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[11px] font-bold text-amber-600">
-                        ⏳ ต้องตรวจสอบ
-                      </span>
-                    )}
                   </div>
-                  <p className="mt-1 text-xs text-slate-400">
-                    {formatDateTime(order.createdAt)} น. · ลูกค้า: {order.user?.name} ({order.user?.email})
+                  <p className="num text-xs" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+                    {formatDateTime(order.createdAt)} น. ลูกค้า {order.user?.name} ({order.user?.email})
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-extrabold text-indigo-600">{THB(order.total)}</div>
-                  <div className="text-xs text-slate-400">{order.items.reduce((s, i) => s + i.quantity, 0)} ชิ้น</div>
+                  <p className="num text-lg font-bold" style={{ color: "var(--color-accent-deep)" }}>{THB(order.total)}</p>
+                  <p className="num text-xs" style={{ color: "var(--color-muted)" }}>
+                    {order.items.reduce((s, i) => s + i.quantity, 0)} ชิ้น
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-3 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
-                🚚 จัดส่งถึง: <b>{order.shippingName}</b> · {order.phone}
-                <br />
-                📮 {order.address}
-                {order.note && <><br />📝 หมายเหตุ: {order.note}</>}
+              <div className="well mt-[var(--space-md)] p-[var(--space-md)] text-xs" style={{ color: "var(--color-ink-2)" }}>
+                <p>ส่งถึง {order.shippingName} เบอร์ {order.phone}</p>
+                <p style={{ marginTop: "var(--space-2xs)" }}>{order.address}</p>
+                {order.note && <p style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>หมายเหตุ {order.note}</p>}
               </div>
 
-              <ul className="mt-3 space-y-1 text-sm text-slate-600">
+              <ul className="mt-[var(--space-md)] space-y-[var(--space-2xs)] text-sm" style={{ color: "var(--color-ink-2)" }}>
                 {order.items.map((it) => (
-                  <li key={it.id} className="flex justify-between">
+                  <li key={it.id} className="flex justify-between gap-[var(--space-sm)]">
                     <span className="line-clamp-1">
-                      {it.product?.name ?? `#${it.productId}`} × {it.quantity}
+                      {it.product?.name ?? `สินค้าหมายเลข ${it.productId}`} <span className="num">x{it.quantity}</span>
                     </span>
-                    <span className="ml-3 shrink-0">{THB(it.price * it.quantity)}</span>
+                    <span className="num ml-[var(--space-sm)] shrink-0">{THB(it.price * it.quantity)}</span>
                   </li>
                 ))}
               </ul>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-[var(--space-md)] flex flex-wrap gap-[var(--space-xs)]">
                 {order.slipUrl && (
                   <button
+                    type="button"
                     onClick={() => setSlipOrder(order)}
-                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-medium hover:bg-slate-50"
+                    className="btn btn--sm btn--quiet"
                   >
-                    🧾 ดูสลิป
+                    ดูสลิปโอนเงิน
                   </button>
                 )}
                 {order.status === "PENDING_VERIFY" && (
                   <>
                     <button
+                      type="button"
                       disabled={busyId === order.id}
                       onClick={() => updateStatus(order, "PAID")}
-                      className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
+                      className="btn btn--sm btn--primary"
+                      aria-busy={busyId === order.id}
                     >
-                      ✅ อนุมัติสลิป (ชำระเงินแล้ว)
                     </button>
                     <button
+                      type="button"
                       disabled={busyId === order.id}
                       onClick={() => reject(order)}
-                      className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-500 disabled:opacity-50"
+                      className="btn btn--sm btn--quiet"
                     >
-                      ❌ ปฏิเสธสลิป
                     </button>
                   </>
                 )}
                 {order.status === "PAID" && (
                   <button
+                    type="button"
                     disabled={busyId === order.id}
                     onClick={() => updateStatus(order, "SHIPPED")}
-                    className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 disabled:opacity-50"
+                    className="btn btn--sm btn--primary"
+                    aria-busy={busyId === order.id}
                   >
-                    🚚 ทำเครื่องหมายจัดส่งแล้ว
                   </button>
                 )}
                 {order.status === "SHIPPED" && (
                   <button
+                    type="button"
                     disabled={busyId === order.id}
                     onClick={() => updateStatus(order, "COMPLETED")}
-                    className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-700 disabled:opacity-50"
+                    className="btn btn--sm btn--primary"
+                    aria-busy={busyId === order.id}
                   >
-                    ✅ ยืนยันรับสินค้าแล้ว (เสร็จสิ้น)
                   </button>
                 )}
                 {["AWAITING_PAYMENT", "PENDING_VERIFY", "REJECTED"].includes(order.status) && (
                   <button
+                    type="button"
                     disabled={busyId === order.id}
                     onClick={() => {
                       if (confirm(`ยกเลิกคำสั่งซื้อ ${orderNo(order.id)}?`)) updateStatus(order, "CANCELLED", "แอดมินยกเลิกคำสั่งซื้อ");
                     }}
-                    className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-medium text-slate-500 hover:bg-slate-50 disabled:opacity-50"
+                    className="btn btn--sm btn--quiet"
+                    style={{ color: "var(--color-muted)" }}
                   >
-                    ยกเลิกคำสั่งซื้อ
                   </button>
                 )}
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}
 
       {/* slip modal */}
       {slipOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4" onClick={() => setSlipOrder(null)}>
-          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h3 className="font-extrabold">สลิปคำสั่งซื้อ {orderNo(slipOrder.id)}</h3>
-              <button onClick={() => setSlipOrder(null)} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100">✕</button>
+        <div className="modal-scrim" onClick={() => setSlipOrder(null)}>
+          <div className="modal" role="dialog" aria-modal="true" aria-labelledby="slip-modal-title" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "28rem" }}>
+            <div className="flex items-start justify-between gap-[var(--space-md)]">
+              <div>
+                <h2 id="slip-modal-title" className="num" style={{ fontSize: "var(--text-md)", letterSpacing: 0 }}>
+                  สลิปของ {orderNo(slipOrder.id)}
+                </h2>
+                <p className="num text-sm" style={{ color: "var(--color-muted)", marginTop: "var(--space-2xs)" }}>
+                  ยอดคำสั่งซื้อ {THB(slipOrder.total)} เทียบกับยอดในสลิปก่อนอนุมัติ
+                </p>
+              </div>
+              <button type="button" onClick={() => setSlipOrder(null)} className="icon-btn" aria-label="ปิดหน้าต่าง">
+                <X size={18} weight="bold" aria-hidden="true" />
+              </button>
             </div>
-            <p className="mt-1 text-xs text-slate-500">
-              ยอดคำสั่งซื้อ: <b className="text-indigo-600">{THB(slipOrder.total)}</b> — เทียบกับยอดในสลิปก่อนอนุมัติ
-            </p>
-            <div className="mt-4 rounded-xl bg-slate-100 p-3">
+            <div className="slip-frame mt-[var(--space-md)]">
               {slipOrder.slipUrl?.toLowerCase().endsWith(".pdf") ? (
                 <a
                   href={media(slipOrder.slipUrl)}
                   target="_blank"
                   rel="noreferrer"
-                  className="block rounded-xl bg-white px-4 py-6 text-center text-sm font-medium text-indigo-600"
+                  className="btn btn--sm btn--quiet"
+                  style={{ margin: "var(--space-md) auto" }}
                 >
-                  📄 เปิดไฟล์สลิป (PDF)
                 </a>
               ) : (
                 slipOrder.slipUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={media(slipOrder.slipUrl)} alt="สลิปโอนเงิน" className="mx-auto max-h-[55vh] rounded-lg object-contain" />
+                  <img src={media(slipOrder.slipUrl)} alt={`สลิปโอนเงินของคำสั่งซื้อ ${orderNo(slipOrder.id)}`} loading="lazy" />
                 )
               )}
             </div>
             {slipOrder.status === "PENDING_VERIFY" && (
-              <div className="mt-4 flex gap-2">
+              <div className="mt-[var(--space-md)] flex gap-[var(--space-xs)]">
                 <button
+                  type="button"
                   onClick={() => updateStatus(slipOrder, "PAID")}
-                  className="flex-1 rounded-xl bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500"
+                  className="btn btn--primary flex-1"
                 >
-                  ✅ อนุมัติ
                 </button>
                 <button
+                  type="button"
                   onClick={() => reject(slipOrder)}
-                  className="flex-1 rounded-xl bg-rose-600 py-2.5 text-sm font-semibold text-white hover:bg-rose-500"
+                  className="btn btn--quiet flex-1"
                 >
-                  ❌ ปฏิเสธ
                 </button>
               </div>
             )}
