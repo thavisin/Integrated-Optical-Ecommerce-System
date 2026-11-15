@@ -36,7 +36,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="shop-card-body">
-        <p className="small">
+        <p className="small shop-card-meta">
           <span>{categoryLabel(product.category)}</span>{" "}
           <span>{product.brand || "OptiMart"}</span>
         </p>

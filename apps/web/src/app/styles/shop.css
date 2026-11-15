@@ -3,12 +3,15 @@
  * copy: reworded "คงเหลือในสต็อก 5 ชิ้น" to the ruled pair "คงเหลือ" / "5 ชิ้น" · brief Step 5 (the buy well carries stock as a ruled row)
  * copy: reworded "สินค้าหมดชั่วคราว พบกันรอบหน้า" to "หมดชั่วคราว" · brief Step 5 (the buy well's stock row)
  * copy: reworded "กรอบแว่น แบรนด์ OptiMart" to "แบรนด์ OptiMart" · brief Step 5 (the buy well's category row carries the category)
- * copy: added "หมวดหมู่", "คงเหลือ", "ราคา" · the buy well is a .rule-list, so each row needs its label */
+ * copy: added "หมวดหมู่", "คงเหลือ", "ราคา" · the buy well is a .rule-list, so each row needs its label
+ * copy: reworded "{category} · {brand}" to two spans "{category}" / "{brand}" on the product card · Floor 10 forbids middle-dot-joined meta (.shop-card-meta sets the gap)
+ * copy: dropped "มาใหม่ในร้าน" · the hero card's badge; the caption carries category and name */
 @layer components {
 /* ---------- home: the Ledge ---------- */
 
 .shop-hero { padding-block: var(--space-xl); }
 
+.shop-card-meta { display: flex; flex-wrap: wrap; column-gap: var(--space-sm); }
 .shop-hero-grid { display: grid; gap: var(--space-xl); }
 .shop-hero-copy { max-width: 38rem; }
 

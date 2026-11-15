@@ -85,6 +85,7 @@ export default function AdminOrdersPage() {
 
   const askReject = (order: Order) => {
     setRejectReason("");
+    setError("");
     setSlipOrder(null);
     setRejectTarget(order);
   };
@@ -178,7 +179,7 @@ export default function AdminOrdersPage() {
                       {order.slipUrl && (
                         <button
                           type="button"
-                          onClick={() => setSlipOrder(order)}
+                          onClick={() => { setError(""); setSlipOrder(order); }}
                           className="btn btn--sm btn--quiet"
                         >
                           ดูสลิปโอนเงิน
