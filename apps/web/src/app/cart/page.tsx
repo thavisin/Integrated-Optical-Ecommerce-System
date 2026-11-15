@@ -12,9 +12,9 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="container max-w-3xl" style={{ paddingBlock: "var(--space-2xl)" }}>
+      <div className="container max-w-3xl py-16">
         <EmptyState icon="cart" title="ตะกร้ายังว่างอยู่">
-          <Link href="/products" className="btn btn--sm mt-[var(--space-2xs)] btn--primary">
+          <Link href="/products" className="btn btn--sm btn--primary mt-2">
             เลือกซื้อแว่นตากับร้าน
           </Link>
         </EmptyState>
@@ -23,94 +23,86 @@ export default function CartPage() {
   }
 
   return (
-    <div className="container" style={{ paddingBlock: "var(--space-lg) var(--section-gap-s)" }}>
+    <div className="container py-10">
       <h1>ตะกร้าสินค้า</h1>
 
-      <div className="mt-[var(--space-xl)] grid gap-[var(--space-lg)] lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="card p-[var(--space-lg)]">
-          <ul className="stack" style={{ gap: "var(--space-lg)" }}>
-            {items.map((item) => (
-              <li key={item.productId} className="flex flex-wrap items-center gap-[var(--space-md)]">
-                <Link
-                  href={`/products/${item.productId}`}
-                  className="frame"
-                  style={{ width: "5rem", height: "3.75rem", borderRadius: "var(--radius-input)", flexShrink: 0 }}
-                  aria-label={`ดูรายละเอียด ${item.name}`}
-                >
-                  {item.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={media(item.imageUrl)} alt={item.name} loading="lazy" width={80} height={60} />
-                  ) : (
-                    <span aria-hidden="true" className="h-full w-full" />
-                  )}
+      <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <ul className="acct-rows">
+          {items.map((item) => (
+            <li key={item.productId}>
+              <Link
+                href={`/products/${item.productId}`}
+                className="frame acct-thumb"
+                aria-label={`ดูรายละเอียด ${item.name}`}
+              >
+                {item.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={media(item.imageUrl)} alt={item.name} loading="lazy" width={80} height={60} />
+                ) : (
+                  <span aria-hidden="true" className="h-full w-full" />
+                )}
+              </Link>
+
+              <div className="acct-body">
+                <Link href={`/products/${item.productId}`} className="line-clamp-1 font-medium no-underline hover:underline">
+                  {item.name}
                 </Link>
+                <p className="small">{item.brand}</p>
+                <p className="num mt-1 text-sm text-ink">{THB(item.price)}</p>
+              </div>
 
-                <div className="min-w-0 flex-1">
-                  <Link href={`/products/${item.productId}`} className="line-clamp-1 font-medium no-underline hover:underline">
-                    {item.name}
-                  </Link>
-                  <p className="text-xs" style={{ color: "var(--color-muted)" }}>{item.brand}</p>
-                  <p className="num mt-[var(--space-2xs)]" style={{ color: "var(--color-ink)", fontSize: "var(--text-sm)" }}>
-                    {THB(item.price)}
-                  </p>
-                </div>
+              <div className="stepper">
+                <button
+                  type="button"
+                  onClick={() => setQty(item.productId, item.quantity - 1)}
+                  aria-label={`ลดจำนวน ${item.name}`}
+                  className="icon-btn"
+                >
+                  −
+                </button>
+                <span className="num">{item.quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQty(item.productId, item.quantity + 1)}
+                  aria-label={`เพิ่มจำนวน ${item.name}`}
+                  className="icon-btn"
+                >
+                  +
+                </button>
+              </div>
 
-                <div className="flex items-center" style={{ border: "1px solid var(--color-rule)", borderRadius: "var(--radius-input)" }}>
-                  <button
-                    type="button"
-                    onClick={() => setQty(item.productId, item.quantity - 1)}
-                    aria-label={`ลดจำนวน ${item.name}`}
-                    className="icon-btn"
-                    style={{ width: "2.5rem", height: "2.5rem", fontSize: "var(--text-md)" }}
-                  >
-                    −
-                  </button>
-                  <span className="num" style={{ minWidth: "2rem", textAlign: "center", fontSize: "var(--text-sm)" }}>{item.quantity}</span>
-                  <button
-                    type="button"
-                    onClick={() => setQty(item.productId, item.quantity + 1)}
-                    aria-label={`เพิ่มจำนวน ${item.name}`}
-                    className="icon-btn"
-                    style={{ width: "2.5rem", height: "2.5rem", fontSize: "var(--text-md)" }}
-                  >
-                    +
-                  </button>
-                </div>
-
-                <p className="num w-[6rem] text-right font-medium" style={{ fontSize: "var(--text-sm)" }}>
-                  {THB(item.price * item.quantity)}
-                </p>
+              <div className="acct-row-end">
+                <p className="acct-line-total">{THB(item.price * item.quantity)}</p>
 
                 <button
                   type="button"
                   onClick={() => remove(item.productId)}
-                  className="icon-btn"
-                  style={{ color: "var(--color-muted)" }}
+                  className="icon-btn text-muted"
                   aria-label={`นำ ${item.name} ออกจากตะกร้า`}
                 >
                   <Trash size={16} weight="bold" aria-hidden="true" />
                 </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+              </div>
+            </li>
+          ))}
+        </ul>
 
-        <aside className="card h-fit p-[var(--space-lg)]">
-          <h2 style={{ fontSize: "var(--text-title)" }}>สรุปคำสั่งซื้อ</h2>
-          <div className="mt-[var(--space-md)] space-y-[var(--space-sm)] text-sm" style={{ color: "var(--color-ink-2)" }}>
-            <p className="flex justify-between">
-              <span>จำนวนสินค้า</span>
-              <span className="num">{items.reduce((s, i) => s + i.quantity, 0)} ชิ้น</span>
-            </p>
-            <p className="flex justify-between border-t pt-[var(--space-sm)] text-base font-bold" style={{ borderColor: "var(--color-rule)", color: "var(--color-ink)" }}>
-              <span>ยอดรวม</span>
-              <span className="num" style={{ color: "var(--color-accent-deep)" }}>{THB(total)}</span>
-            </p>
-          </div>
-          <Link href="/checkout" className="btn btn--primary mt-[var(--space-lg)] w-full">
+        <aside className="well h-fit">
+          <h2 className="text-title">สรุปคำสั่งซื้อ</h2>
+          <dl className="rule-list">
+            <div>
+              <dt>จำนวนสินค้า</dt>
+              <dd className="num">{items.reduce((s, i) => s + i.quantity, 0)} ชิ้น</dd>
+            </div>
+            <div>
+              <dt>ยอดรวม</dt>
+              <dd className="num">{THB(total)}</dd>
+            </div>
+          </dl>
+          <Link href="/checkout" className="btn btn--primary mt-6 w-full">
             ดำเนินการสั่งซื้อ
           </Link>
-          <Link href="/products" className="mt-[var(--space-sm)] block text-center text-sm no-underline hover:underline" style={{ color: "var(--color-muted)" }}>
+          <Link href="/products" className="mt-3 block text-center text-sm text-muted no-underline hover:underline">
             เลือกซื้อสินค้าเพิ่ม
           </Link>
         </aside>

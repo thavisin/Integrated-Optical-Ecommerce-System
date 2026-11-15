@@ -1,5 +1,41 @@
 /* Hallmark · partial of globals.css, which carries the full stamp (theme: Solstice, solstice: long-light, redesign: full, copy: th) */
 /* Account and checkout pages (/cart, /checkout, /orders, /orders/[id], /login, /register): owned by Task 3. Page-specific rules only; shared classes live in globals.css (see apps/web/design.md). */
 @layer components {
-/* page rules go here, inside this layer, so Tailwind utilities still override them */
+/* ruled line items: cart and order detail */
+.acct-rows { list-style: none; margin: 0; padding: 0; border-top: var(--rule-bar) solid var(--color-ink); border-bottom: var(--rule-hair) solid var(--color-rule); }
+.acct-rows > li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm) var(--space-md); padding-block: var(--space-md); border-top: var(--rule-hair) solid var(--color-rule); }
+.acct-rows > li:first-child { border-top: 0; }
+.acct-rows--tight { border-top: 0; border-bottom: 0; }
+.acct-rows--tight > li { padding-block: var(--space-xs); border-top: 0; }
+.frame.acct-thumb { width: 5rem; height: 3.75rem; aspect-ratio: auto; flex: none; }
+.frame.acct-thumb--sm { width: 3rem; height: 2.25rem; }
+.acct-body { flex: 1 1 10rem; min-width: 0; }
+.acct-row-end { display: flex; align-items: center; gap: var(--space-sm); margin-left: auto; }
+.acct-line-total { min-width: 6rem; text-align: right; font: 500 var(--text-md)/1.2 var(--font-body); font-variant-numeric: tabular-nums; color: var(--color-ink); }
+.acct-orders { min-width: 52rem; }
+.acct-orders td:first-child, .acct-orders th:first-child { white-space: nowrap; }
+
+/* the year on one line: a hairline with one stop per status step */
+.acct-timeline { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }
+.acct-timeline::before { content: ""; position: absolute; inset-inline: 0; top: 6px; height: var(--rule-hair); background: var(--color-rule); }
+.acct-timeline > li { position: relative; min-width: 0; padding-top: var(--space-lg); }
+.acct-timeline > li::before { content: ""; position: absolute; top: 0; left: 0; width: 13px; height: 13px; border: var(--rule-hair) solid var(--color-ink); background: var(--color-paper-2); }
+.acct-timeline > li[data-state="done"]::before { background: var(--color-ink); }
+.acct-timeline > li[data-state="now"]::before { background: var(--color-accent); border-color: var(--color-accent); outline: var(--rule-hair) solid var(--color-accent); outline-offset: 3px; }
+.acct-timeline-label { display: block; max-width: 10ch; line-height: 1.25; overflow-wrap: anywhere; }
+.acct-timeline > li[data-state="now"] .acct-timeline-label { color: var(--color-ink); }
+.acct-reason { padding-block: var(--space-xs); }
+
+/* the slip upload: a square field, the label sits above it */
+.field.acct-file { padding: var(--space-2xs) var(--space-sm); }
+.acct-file::file-selector-button { margin-right: var(--space-sm); padding: var(--space-2xs) var(--space-sm); border: var(--rule-hair) solid var(--color-ink); border-radius: 0; background: var(--color-paper); color: var(--color-ink); font: 500 var(--text-sm)/1.4 var(--font-body); cursor: pointer; }
+.acct-file::file-selector-button:hover { background: var(--color-paper-3); }
+.acct-slip { max-width: 26rem; padding: var(--space-xs); background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); }
+.acct-slip img { width: 100%; height: auto; }
+.acct-slip-preview { margin-top: var(--space-sm); max-height: 16rem; width: auto; padding: var(--space-2xs); border: var(--rule-hair) solid var(--color-rule); background: var(--color-paper-2); object-fit: contain; }
+.acct-address .rule-list dt { white-space: nowrap; }
+.acct-address .rule-list dd { font-size: var(--text-md); line-height: 1.45; }
+
+/* auth: the demo credentials under the one well, on a gold hairline */
+.acct-auth-demo { display: grid; gap: var(--space-2xs); margin-top: var(--space-lg); padding-top: var(--space-md); border-top: var(--rule-hair) solid var(--color-gold); }
 }

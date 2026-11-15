@@ -21,22 +21,22 @@ export default function LoginPage() {
     try {
       const user = await login(email, password);
       router.push(user.role === "ADMIN" ? "/admin" : "/");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container max-w-md" style={{ paddingBlock: "var(--section-gap-s)" }}>
-      <div className="card p-[var(--space-xl)]">
-        <h1 style={{ fontSize: "var(--text-2xl)" }}>เข้าสู่ระบบ</h1>
-        <p className="text-sm" style={{ marginTop: "var(--space-2xs)", color: "var(--color-muted)" }}>
+    <div className="container max-w-md py-16">
+      <div className="well">
+        <h1 className="text-2xl">เข้าสู่ระบบ</h1>
+        <p className="mt-2 text-sm text-muted">
           เข้าสู่ระบบเพื่อสั่งซื้อและติดตามคำสั่งซื้อ
         </p>
 
-        <form onSubmit={submit} className="mt-[var(--space-lg)] stack">
+        <form onSubmit={submit} className="stack mt-6">
           <div>
             <label className="label" htmlFor="login-email">อีเมล</label>
             <input
@@ -71,20 +71,18 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-[var(--space-md)] text-center text-sm" style={{ color: "var(--color-muted)" }}>
-          ยังไม่มีบัญชี <Link href="/register" className="font-medium no-underline hover:underline" style={{ color: "var(--color-accent-deep)" }}>สมัครสมาชิกฟรี</Link>
+        <p className="mt-4 text-center text-sm text-muted">
+          ยังไม่มีบัญชี <Link href="/register" className="font-medium text-ink no-underline hover:underline">สมัครสมาชิกฟรี</Link>
         </p>
-      </div>
 
-      <div className="pharm-label mt-[var(--space-md)]">
-        <p className="pharm-head">
-          <span>บัญชีทดลองของระบบ</span>
-          <span>demo</span>
-        </p>
-        <p className="mt-[var(--space-xs)]" style={{ display: "grid", gap: "var(--space-2xs)" }}>
-          <span>ลูกค้า customer@example.com / customer123</span>
-          <span>แอดมิน admin@optimart.com / admin123</span>
-        </p>
+        <div className="acct-auth-demo">
+          <p className="small flex justify-between gap-4">
+            <span>บัญชีทดลองของระบบ</span>
+            <span>demo</span>
+          </p>
+          <p className="small">ลูกค้า customer@example.com / customer123</p>
+          <p className="small">แอดมิน admin@optimart.com / admin123</p>
+        </div>
       </div>
     </div>
   );
