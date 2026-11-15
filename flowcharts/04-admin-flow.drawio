@@ -1,0 +1,136 @@
+<mxfile host="app.diagrams.net" agent="opencode" version="24.7.7">
+  <diagram id="admin-flow" name="Admin Flow">
+    <mxGraphModel dx="1000" dy="1050" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1000" pageHeight="1050" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="a0" value="Start" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="120" y="50" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" value="Login (JWT)&lt;br&gt;เฉพาะ user แอดมินที่สร้างไว้ในระบบ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="100" y="130" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" value="เข้าสู่ Admin Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="100" y="230" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tB" value="B. Inventory Management (จัดการสินค้า)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="60" y="410" width="240" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tC" value="C. ตรวจสอบสลิป / คำสั่งซื้อ" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="350" y="410" width="220" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tD" value="D. Sales Analytics (Dashboard)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="670" y="410" width="220" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="b1" value="จัดการสินค้า&lt;br&gt;(เพิ่ม / แก้ไข / ลบ)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="80" y="450" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b2" value="กรอกข้อมูลแว่นตา: ชื่อ แบรนด์&lt;br&gt;ชนิดเฟรม ราคา จำนวนสต็อก รูปภาพ" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="80" y="530" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b3" value="ข้อมูลถูกต้อง?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="115" y="620" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="b4" value="บันทึก / อัปเดตสินค้าลง DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="80" y="730" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b5" value="ปรับจำนวนสต็อก / ลบสินค้า" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="80" y="810" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="v1" value="ดูรายการ Order ที่รอตรวจ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="360" y="450" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="v2" value="เปิดสลิป เทียบยอดเงิน&lt;br&gt;กับยอดคำสั่งซื้อ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="360" y="530" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="v3" value="สลิปถูกต้อง?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="395" y="620" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="v4" value="อนุมัติ: สถานะ = ชำระแล้ว&lt;br&gt;หักสต็อกสินค้า แจ้งเตือนลูกค้า" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="360" y="730" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="v5" value="ปฏิเสธ: แจ้งเหตุผล&lt;br&gt;ให้ลูกค้าอัปโหลดสลิปใหม่" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="360" y="820" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" value="เปิดหน้า Dashboard&lt;br&gt;วิเคราะห์ยอดขาย" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="680" y="450" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" value="Query ข้อมูล orders / สินค้า&lt;br&gt;จาก DB (Django ORM)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="680" y="540" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" value="คำนวณ: ยอดขายรวม จำนวนออเดอร์&lt;br&gt;สินค้าขายดี แนวโน้มรายเดือน" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="680" y="630" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" value="แสดงกราฟ / ตารางสรุป" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="680" y="720" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="ฐานข้อมูล (DB)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="380" y="930" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="a0" target="a1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="a1" target="a3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="a3" target="b1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="a3" target="v1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="a3" target="d1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="b1" target="b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="b2" target="b3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e11" value="ไม่ใช่ (แก้ไข)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" edge="1" parent="1" source="b3" target="b2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e12" value="ใช่" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="b3" target="b4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="b4" target="b5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="v1" target="v2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="v2" target="v3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e16" value="ใช่" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="v3" target="v4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e17" value="ไม่ใช่" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="v3" target="v5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e18" value="ลูกค้าอัปโหลดสลิปใหม่" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" edge="1" parent="1" source="v5" target="v1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="d1" target="d2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="d2" target="d3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="d3" target="d4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" edge="1" parent="1" source="b4" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" edge="1" parent="1" source="v4" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ad_e24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" edge="1" parent="1" source="d2" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

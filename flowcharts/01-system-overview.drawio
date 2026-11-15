@@ -1,0 +1,82 @@
+<mxfile host="app.diagrams.net" agent="opencode" version="24.7.7">
+  <diagram id="sys-overview" name="System Overview">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Integrated Optical E-commerce System (Django) — System Overview" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="300" y="0" width="600" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="actorC" value="ลูกค้า (Customer)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="160" y="40" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="actorA" value="แอดมิน (Admin)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="880" y="40" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="uiC" value="หน้าร้าน Storefront UI&lt;br&gt;เข้าชม / ค้นหาสินค้า / ตะกร้า / checkout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="60" y="160" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uiA" value="Admin Dashboard UI&lt;br&gt;จัดการสินค้า / ตรวจสลิป / รายงานยอดขาย" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="820" y="160" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="backend" value="Django + Django REST Framework (Backend API)" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="60" y="280" width="1080" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="modAuth" value="Auth Module&lt;br&gt;Signup / Signin&lt;br&gt;JWT + hash password (bcrypt)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="90" y="330" width="190" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="modProd" value="Product &amp;amp; Search Module&lt;br&gt;CRUD สินค้าแว่นตา&lt;br&gt;text search (icontains)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="300" y="330" width="190" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="modOrder" value="Cart &amp;amp; Order Module&lt;br&gt;ตะกร้า / checkout&lt;br&gt;อัปโหลดสลิป" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="510" y="330" width="190" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="modVerify" value="Slip Verification&lt;br&gt;อนุมัติ / ปฏิเสธ&lt;br&gt;คำสั่งซื้อ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="720" y="330" width="190" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="modAna" value="Analytics Module&lt;br&gt;ยอดขายรวม / สินค้าขายดี&lt;br&gt;แนวโน้มการสั่งซื้อ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="930" y="330" width="190" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="ฐานข้อมูล (PostgreSQL / SQLite)&lt;br&gt;users · products · orders · payment_slips" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="460" y="550" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="noteGuest" value="Note: Guest เข้าชม / ค้นหาสินค้าได้&lt;br&gt;แต่ add to cart / checkout ต้อง login" style="shape=note;whiteSpace=wrap;html=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="60" y="560" width="330" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="noteJwt" value="Note: ทุก API ที่ต้อง login ใช้ Header&lt;br&gt;Authorization: Bearer &amp;lt;JWT&amp;gt;" style="shape=note;whiteSpace=wrap;html=1;size=15;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="810" y="560" width="330" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="actorC" target="uiC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="actorA" target="uiA">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e3" value="signin / signup" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="uiC" target="modAuth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e4" value="ดู / ค้นหาสินค้า" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="uiC" target="modProd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e5" value="cart / checkout + ส่งสลิป" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="uiC" target="modOrder">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e6" value="จัดการสินค้า (CRUD)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="uiA" target="modProd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e7" value="ตรวจสลิป" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="uiA" target="modVerify">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e8" value="ดูรายงาน" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="uiA" target="modAna">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e9" value="ส่งสลิปให้แอดมิน" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;" edge="1" parent="1" source="modOrder" target="modVerify">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ov_e10" value="Django ORM" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;" edge="1" parent="1" source="backend" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

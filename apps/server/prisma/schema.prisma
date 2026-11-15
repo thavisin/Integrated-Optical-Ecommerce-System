@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String // เก็บ bcrypt hash เท่านั้น
+  role      String   @default("CUSTOMER") // CUSTOMER | ADMIN
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  brand       String      @default("")
+  description String      @default("")
+  category    String      @default("FRAME") // FRAME | SUNGLASS | LENS | ACCESSORY
+  price       Float
+  stock       Int         @default(0)
+  imageUrl    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id           Int         @id @default(autoincrement())
+  userId       Int
+  user         User        @relation(fields: [userId], references: [id])
+  total        Float
+  // AWAITING_PAYMENT | PENDING_VERIFY | PAID | SHIPPED | COMPLETED | REJECTED | CANCELLED
+  status       String      @default("AWAITING_PAYMENT")
+  slipUrl      String?
+  note         String? // เหตุผลกรณีปฏิเสธสลิป
+  shippingName String
+  phone        String
+  address      String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  items        OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float // ราคา ณ วันสั่งซื้อ
+}

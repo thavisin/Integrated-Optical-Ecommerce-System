@@ -1,0 +1,19 @@
+{
+  "name": "glasses-market",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Integrated Optical E-commerce System — ระบบพาณิชย์อิเล็กทรอนิกส์สำหรับร้านแว่นตา (Monorepo: Next.js + Express + Prisma)",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "setup": "npm run setup --workspace @optimart/server",
+    "dev": "concurrently -n server,web -c blue,green \"npm run dev --workspace @optimart/server\" \"npm run dev --workspace @optimart/web\"",
+    "dev:server": "npm run dev --workspace @optimart/server",
+    "dev:web": "npm run dev --workspace @optimart/web",
+    "build": "npm run build --workspace @optimart/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
